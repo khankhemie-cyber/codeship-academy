@@ -44,7 +44,7 @@ export default function AddChildForm({ parentId }: Props) {
         </div>
       )}
       <div>
-        <label className="label">Child's Display Name</label>
+        <label className="label">Child&apos;s Display Name</label>
         <input
           type="text"
           className="input"

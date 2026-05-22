@@ -121,7 +121,7 @@ export default function SettingsPage() {
           />
           <div>
             <p className="font-medium text-gray-800">Weekly progress digest</p>
-            <p className="text-sm text-gray-500">Receive a weekly summary of your child's learning progress.</p>
+            <p className="text-sm text-gray-500">Receive a weekly summary of your child&apos;s learning progress.</p>
           </div>
         </label>
         <p className="text-xs text-gray-400 mt-3">

@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnySupabase = any
 
 function isSupabaseClient(arg: unknown): arg is AnySupabase {

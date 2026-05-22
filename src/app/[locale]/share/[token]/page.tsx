@@ -61,7 +61,7 @@ export default async function SharePage({ params }: { params: { locale: string; 
         ) : (
           <div className="p-8 text-center">
             <div className="text-5xl mb-4">📂</div>
-            <h1 className="text-xl font-bold text-gray-900 mb-2">{studentName}'s Project</h1>
+            <h1 className="text-xl font-bold text-gray-900 mb-2">{studentName}&apos;s Project</h1>
             <p className="text-gray-500 mb-6">This project was created on CODEship Academy.</p>
             <Link href={`/${params.locale}/signup`} className="btn-primary">
               Build Your Own Projects
