@@ -1,0 +1,158 @@
+{
+  "common": {
+    "appName": "CODEship Academy",
+    "tagline": "RÊVER. CODER. RÉUSSIR.",
+    "login": "Connexion",
+    "signup": "S'inscrire",
+    "logout": "Se déconnecter",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "loading": "Chargement…",
+    "error": "Une erreur s'est produite. Veuillez réessayer.",
+    "success": "Succès!",
+    "required": "Obligatoire",
+    "optional": "Optionnel",
+    "startFreeTrial": "Commencer l'essai gratuit",
+    "viewAll": "Voir tout",
+    "noDataFound": "Aucune donnée trouvée"
+  },
+  "nav": {
+    "overview": "Aperçu",
+    "myChildren": "Mes Enfants",
+    "assessment": "Évaluation IA",
+    "planner": "Plan d'apprentissage",
+    "progress": "Progrès",
+    "subscription": "Abonnement",
+    "todayTask": "Tâche du jour",
+    "curriculum": "Apprendre",
+    "codeLab": "Labo de code",
+    "achievements": "Succès",
+    "leaderboard": "Classement",
+    "certificates": "Certificats",
+    "settings": "Paramètres",
+    "classes": "Mes Classes",
+    "reports": "Rapports",
+    "schoolPortal": "Portail scolaire",
+    "users": "Utilisateurs",
+    "analytics": "Analytiques",
+    "auditLog": "Journal d'audit",
+    "subscriptions": "Abonnements",
+    "curriculumCMS": "Programme"
+  },
+  "auth": {
+    "emailAddress": "Adresse email",
+    "password": "Mot de passe",
+    "fullName": "Nom complet",
+    "confirmPassword": "Confirmer le mot de passe",
+    "signIn": "Se connecter",
+    "createAccount": "Créer un compte",
+    "forgotPassword": "Mot de passe oublié?",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "sendResetLink": "Envoyer le lien",
+    "backToLogin": "Retour à la connexion",
+    "iAmA": "Je suis…",
+    "parent": "Parent",
+    "teacher": "Enseignant",
+    "termsConsent": "J'accepte les conditions d'utilisation",
+    "privacyConsent": "J'ai lu et j'accepte la politique de confidentialité",
+    "checkEmail": "Vérifiez votre boîte de réception!",
+    "verifyEmailMessage": "Nous avons envoyé un lien de vérification à votre adresse email.",
+    "noAccount": "Pas encore de compte?",
+    "haveAccount": "Vous avez déjà un compte?"
+  },
+  "dashboard": {
+    "welcomeBack": "Bon retour",
+    "parent": {
+      "title": "Tableau de bord parent",
+      "addChild": "+ Ajouter un enfant",
+      "aiAssessment": "Évaluation IA",
+      "generatePlan": "Générer un plan",
+      "viewProgress": "Voir les progrès",
+      "manageSub": "Abonnement",
+      "noChildren": "Pas encore d'enfants",
+      "noChildrenDesc": "Ajoutez votre premier enfant pour commencer l'évaluation IA.",
+      "addFirstChild": "Ajouter votre premier enfant",
+      "trialWarning": "Essai gratuit: {days} jours restants",
+      "subscribeNow": "S'abonner maintenant"
+    },
+    "student": {
+      "todayTask": "Tâche du jour",
+      "startNow": "Commencer →",
+      "continueLearn": "Continuer l'apprentissage",
+      "streakDays": "jours consécutifs",
+      "explore": "Explorer"
+    },
+    "teacher": {
+      "title": "Tableau de bord enseignant",
+      "activeClasses": "Classes actives",
+      "totalStudents": "Total d'élèves",
+      "quizzesThisWeek": "Quiz cette semaine",
+      "newClass": "+ Nouvelle classe",
+      "noClasses": "Pas encore de classes",
+      "noClassesDesc": "Créez votre première classe pour commencer.",
+      "createClass": "Créer une classe"
+    }
+  },
+  "curriculum": {
+    "browser": "Navigateur de programme",
+    "allLevels": "Tous les niveaux",
+    "lessons": "Leçons",
+    "projects": "Projets",
+    "quizzes": "Quiz",
+    "status": {
+      "not_started": "○ Nouveau",
+      "in_progress": "◑ En cours",
+      "completed": "● Terminé",
+      "needs_review": "↻ Révision"
+    },
+    "duration": "{min} min",
+    "xpReward": "{xp} XP",
+    "noContent": "Aucun contenu trouvé",
+    "noContentDesc": "Essayez d'ajuster vos filtres ou sélectionnez un niveau différent."
+  },
+  "lesson": {
+    "heartsRemaining": "{hearts} cœurs restants",
+    "completed": "Leçon terminée! +{xp} XP gagnés",
+    "markComplete": "Marquer comme terminé ✓",
+    "askTutor": "Demander au tuteur IA",
+    "tutorTitle": "Tuteur IA",
+    "tutorSubtitle": "Demandez des indices — pas les réponses!",
+    "tutorPlaceholder": "Posez une question…",
+    "tutorWelcome": "Bonjour! Je suis votre aide au codage. Posez-moi n'importe quelle question sur cette leçon!"
+  },
+  "achievements": {
+    "title": "Succès",
+    "earned": "Obtenus",
+    "locked": "Verrouillés",
+    "noAchievements": "Pas encore de succès — continuez à apprendre!"
+  },
+  "leaderboard": {
+    "title": "Classement",
+    "rank": "Rang",
+    "student": "Élève",
+    "xp": "XP",
+    "streak": "Série",
+    "private": "Privé",
+    "optOut": "Se retirer du classement"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "profile": "Profil",
+    "emailPrefs": "Préférences email",
+    "language": "Langue",
+    "password": "Mot de passe",
+    "deleteAccount": "Supprimer le compte",
+    "saveChanges": "Sauvegarder"
+  },
+  "errors": {
+    "notFound": "Page introuvable",
+    "notFoundDesc": "La page que vous recherchez n'existe pas.",
+    "unauthorized": "Vous devez être connecté pour voir cette page.",
+    "forbidden": "Vous n'avez pas la permission de voir cette page."
+  }
+}
