@@ -1,0 +1,158 @@
+{
+  "common": {
+    "appName": "CODEship Academy",
+    "tagline": "DREAM. CODE. ACHIEVE.",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Sign Out",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading…",
+    "error": "Something went wrong. Please try again.",
+    "success": "Success!",
+    "required": "Required",
+    "optional": "Optional",
+    "startFreeTrial": "Start Free Trial",
+    "viewAll": "View All",
+    "noDataFound": "No data found"
+  },
+  "nav": {
+    "overview": "Overview",
+    "myChildren": "My Children",
+    "assessment": "AI Assessment",
+    "planner": "Learning Plan",
+    "progress": "Progress",
+    "subscription": "Subscription",
+    "todayTask": "Today's Task",
+    "curriculum": "Learn",
+    "codeLab": "Code Lab",
+    "achievements": "Achievements",
+    "leaderboard": "Leaderboard",
+    "certificates": "Certificates",
+    "settings": "Settings",
+    "classes": "My Classes",
+    "reports": "Reports",
+    "schoolPortal": "School Portal",
+    "users": "Users",
+    "analytics": "Analytics",
+    "auditLog": "Audit Log",
+    "subscriptions": "Subscriptions",
+    "curriculumCMS": "Curriculum"
+  },
+  "auth": {
+    "emailAddress": "Email address",
+    "password": "Password",
+    "fullName": "Full name",
+    "confirmPassword": "Confirm password",
+    "signIn": "Sign in",
+    "createAccount": "Create account",
+    "forgotPassword": "Forgot your password?",
+    "resetPassword": "Reset Password",
+    "sendResetLink": "Send reset link",
+    "backToLogin": "Back to login",
+    "iAmA": "I am a…",
+    "parent": "Parent",
+    "teacher": "Teacher",
+    "termsConsent": "I accept the Terms of Service",
+    "privacyConsent": "I have read and agree to the Privacy Policy",
+    "checkEmail": "Check your inbox!",
+    "verifyEmailMessage": "We've sent a verification link to your email address.",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?"
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back",
+    "parent": {
+      "title": "Parent Dashboard",
+      "addChild": "+ Add Child",
+      "aiAssessment": "Run AI Assessment",
+      "generatePlan": "Generate Plan",
+      "viewProgress": "View Progress",
+      "manageSub": "Subscription",
+      "noChildren": "No children yet",
+      "noChildrenDesc": "Add your first child to get started with the AI assessment.",
+      "addFirstChild": "Add Your First Child",
+      "trialWarning": "Free trial: {days} days remaining",
+      "subscribeNow": "Subscribe Now"
+    },
+    "student": {
+      "todayTask": "Today's Task",
+      "startNow": "Start Now →",
+      "continueLearn": "Continue Learning",
+      "streakDays": "day streak",
+      "explore": "Explore"
+    },
+    "teacher": {
+      "title": "Teacher Dashboard",
+      "activeClasses": "Active Classes",
+      "totalStudents": "Total Students",
+      "quizzesThisWeek": "Quizzes This Week",
+      "newClass": "+ New Class",
+      "noClasses": "No classes yet",
+      "noClassesDesc": "Create your first class to get started.",
+      "createClass": "Create a Class"
+    }
+  },
+  "curriculum": {
+    "browser": "Curriculum Browser",
+    "allLevels": "All Levels",
+    "lessons": "Lessons",
+    "projects": "Projects",
+    "quizzes": "Quizzes",
+    "status": {
+      "not_started": "○ New",
+      "in_progress": "◑ In Progress",
+      "completed": "● Done",
+      "needs_review": "↻ Review"
+    },
+    "duration": "{min} min",
+    "xpReward": "{xp} XP",
+    "noContent": "No content found",
+    "noContentDesc": "Try adjusting your filters or select a different level."
+  },
+  "lesson": {
+    "heartsRemaining": "{hearts} hearts remaining",
+    "completed": "Lesson completed! +{xp} XP earned",
+    "markComplete": "Mark as Complete ✓",
+    "askTutor": "Ask AI Tutor",
+    "tutorTitle": "AI Tutor",
+    "tutorSubtitle": "Ask for hints — not answers!",
+    "tutorPlaceholder": "Ask a question…",
+    "tutorWelcome": "Hi! I'm your coding helper. Ask me anything about this lesson!"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "earned": "Earned",
+    "locked": "Locked",
+    "noAchievements": "No achievements yet — keep learning!"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "rank": "Rank",
+    "student": "Student",
+    "xp": "XP",
+    "streak": "Streak",
+    "private": "Private",
+    "optOut": "Opt out of leaderboard"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "emailPrefs": "Email Preferences",
+    "language": "Language",
+    "password": "Password",
+    "deleteAccount": "Delete Account",
+    "saveChanges": "Save Changes"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "notFoundDesc": "The page you're looking for doesn't exist.",
+    "unauthorized": "You must be logged in to view this page.",
+    "forbidden": "You don't have permission to view this page."
+  }
+}
