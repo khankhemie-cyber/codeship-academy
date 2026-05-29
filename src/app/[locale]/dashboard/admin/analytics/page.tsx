@@ -8,10 +8,10 @@ export default async function AnalyticsPage() {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
   const [newUsersRes, completionsRes, quizPassRes, plansRes] = await Promise.all([
-    supabase.from('profiles').select('created_at, role').gte('created_at', thirtyDaysAgo),
+    supabase.from('users').select('created_at, role').gte('created_at', thirtyDaysAgo),
     supabase.from('lesson_progress').select('completed_at, lessons(level)').eq('status', 'completed').gte('completed_at', thirtyDaysAgo),
     supabase.from('quiz_attempts').select('passed, quizzes(level)').eq('passed', true).gte('completed_at', thirtyDaysAgo),
-    supabase.from('profiles').select('subscription_plan').neq('subscription_plan', 'free').eq('subscription_status', 'active'),
+    supabase.from('subscriptions').select('plan, status').eq('status', 'active'),
   ])
 
   const newUsers = newUsersRes.data || []
@@ -20,8 +20,8 @@ export default async function AnalyticsPage() {
   const activePlans = plansRes.data || []
 
   const planBreakdown: Record<string, number> = {}
-  activePlans.forEach((p: any) => {
-    planBreakdown[p.subscription_plan] = (planBreakdown[p.subscription_plan] || 0) + 1
+  activePlans.forEach((p: { plan: string }) => {
+    planBreakdown[p.plan] = (planBreakdown[p.plan] || 0) + 1
   })
 
   const levelCompletions: Record<string, number> = {}

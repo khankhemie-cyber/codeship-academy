@@ -1,18 +1,27 @@
 import { createClient } from '@/lib/supabase/server'
-import { requireRole } from '@/lib/utils/auth'
-import { notFound } from 'next/navigation'
+import { redirect, notFound } from 'next/navigation'
 import QuizPlayer from '@/components/student/QuizPlayer'
+import { resolveStudentId } from '@/lib/student-session'
 
-export default async function QuizPage({ params }: { params: { locale: string; slug: string } }) {
+export default async function QuizPage({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>
+}) {
+  const { locale, slug } = await params
   const supabase = await createClient()
-  const user = await requireRole(supabase, 'student')
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect(`/${locale}/login`)
 
-  const { data: quiz } = await supabase
-    .from('quizzes')
-    .select('*')
-    .eq('slug', params.slug)
-    .single()
+  const { data: appUser } = await supabase.from('users').select('role').eq('id', user.id).single()
+  if (!appUser || !['parent', 'admin'].includes(appUser.role)) {
+    redirect(`/${locale}/dashboard`)
+  }
 
+  const studentId = await resolveStudentId(supabase, user.id, appUser.role)
+  if (!studentId) redirect(`/${locale}/dashboard/parent/children`)
+
+  const { data: quiz } = await supabase.from('quizzes').select('*').eq('slug', slug).single()
   if (!quiz) notFound()
 
   const { data: questions } = await supabase
@@ -21,29 +30,21 @@ export default async function QuizPage({ params }: { params: { locale: string; s
     .eq('quiz_id', quiz.id)
     .order('sort_order', { ascending: true })
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  // Check for existing incomplete attempt
   const { data: existingAttempt } = await supabase
     .from('quiz_attempts')
-    .select('id, answers, started_at')
+    .select('id, answers')
     .eq('quiz_id', quiz.id)
-    .eq('student_id', profile!.id)
+    .eq('student_id', studentId)
     .is('completed_at', null)
-    .order('started_at', { ascending: false })
+    .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
 
-  // Check best score
   const { data: bestAttempt } = await supabase
     .from('quiz_attempts')
     .select('score, passed')
     .eq('quiz_id', quiz.id)
-    .eq('student_id', profile!.id)
+    .eq('student_id', studentId)
     .not('completed_at', 'is', null)
     .order('score', { ascending: false })
     .limit(1)
@@ -53,12 +54,12 @@ export default async function QuizPage({ params }: { params: { locale: string; s
     <QuizPlayer
       quiz={quiz}
       questions={questions || []}
-      studentId={profile!.id}
+      studentId={studentId}
       existingAttemptId={existingAttempt?.id}
       existingAnswers={existingAttempt?.answers as number[] | null}
       bestScore={bestAttempt?.score ?? null}
       bestPassed={bestAttempt?.passed ?? null}
-      locale={params.locale}
+      locale={locale}
     />
   )
 }

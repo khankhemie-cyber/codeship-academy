@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { resolveStudentId } from '@/lib/student-session'
 
 export default async function StudentDashboard({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
@@ -9,25 +10,35 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
   if (!user) redirect(`/${locale}/login`)
 
   const { data: userData } = await supabase.from('users').select('*').eq('id', user.id).single()
-  if (userData?.role !== 'student' && userData?.role !== 'admin') redirect(`/${locale}/dashboard`)
+  if (!userData) redirect(`/${locale}/login`)
+
+  if (userData.role === 'parent') {
+    const studentId = await resolveStudentId(supabase, user.id, 'parent')
+    if (!studentId) redirect(`/${locale}/dashboard/parent/children`)
+  } else if (userData.role !== 'admin') {
+    redirect(`/${locale}/dashboard`)
+  }
+
+  const studentId = await resolveStudentId(supabase, user.id, userData.role)
+  if (!studentId) redirect(`/${locale}/dashboard/parent/children`)
 
   const { data: student } = await supabase
     .from('student_profiles')
     .select('*')
-    .eq('id', user.id)
+    .eq('id', studentId)
     .single()
 
   const { data: recentProgress } = await supabase
     .from('lesson_progress')
     .select('*, lessons(slug, title, level, category, duration_minutes)')
-    .eq('student_id', user.id)
+    .eq('student_id', studentId)
     .eq('status', 'in_progress')
     .limit(3)
 
   const { data: achievements } = await supabase
     .from('student_achievements')
     .select('*, achievements(name, icon_emoji)')
-    .eq('student_id', user.id)
+    .eq('student_id', studentId)
     .order('awarded_at', { ascending: false })
     .limit(3)
 
@@ -42,8 +53,13 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
 
   const level = student?.level ?? 'explorers'
   const levelEmoji: Record<string, string> = {
-    explorers: '🌱', builders: '🏗️', developers: '💻', engineers: '⚙️'
+    explorers: '🌱',
+    builders: '🏗️',
+    developers: '💻',
+    engineers: '⚙️',
   }
+
+  const displayName = student?.full_name?.split(' ')[0] ?? 'Coder'
 
   return (
     <div>
@@ -51,7 +67,7 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
         <div className="text-4xl">{student?.avatar_emoji ?? '🚀'}</div>
         <div>
           <h1 className="text-2xl font-extrabold text-brand-navy">
-            Hi, {userData?.full_name?.split(' ')[0] ?? 'Coder'}! {levelEmoji[level]}
+            Hi, {displayName}! {levelEmoji[level]}
           </h1>
           <p className="text-gray-500">
             {student?.streak_days ?? 0} day streak · {student?.xp_points ?? 0} XP
@@ -59,12 +75,11 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
         </div>
       </div>
 
-      {/* Today's Task */}
       <section className="mb-8">
         <h2 className="text-lg font-bold text-brand-navy mb-4">📚 Today&apos;s Task</h2>
         {nextLesson ? (
           <div className="card bg-gradient-to-r from-brand-navy to-brand-mid text-white">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <div>
                 <div className="text-xs uppercase tracking-wide text-gray-300 mb-1">{nextLesson.category}</div>
                 <h3 className="font-extrabold text-xl mb-2">{nextLesson.title}</h3>
@@ -89,7 +104,6 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
         )}
       </section>
 
-      {/* Stats */}
       <section className="mb-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
@@ -107,12 +121,11 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
         </div>
       </section>
 
-      {/* In progress */}
       {recentProgress && recentProgress.length > 0 && (
         <section className="mb-8">
           <h2 className="text-lg font-bold text-brand-navy mb-4">📖 Continue Learning</h2>
           <div className="grid gap-4">
-            {recentProgress.map((p: any) => (
+            {recentProgress.map((p: { id: string; lessons?: { slug?: string; title?: string; category?: string; duration_minutes?: number } }) => (
               <Link
                 key={p.id}
                 href={`/${locale}/dashboard/curriculum/${p.lessons?.slug}`}
@@ -120,7 +133,9 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
               >
                 <div>
                   <div className="font-bold text-brand-navy">{p.lessons?.title}</div>
-                  <div className="text-sm text-gray-500">{p.lessons?.category} · {p.lessons?.duration_minutes} min</div>
+                  <div className="text-sm text-gray-500">
+                    {p.lessons?.category} · {p.lessons?.duration_minutes} min
+                  </div>
                 </div>
                 <span className="badge badge-blue">In Progress</span>
               </Link>
@@ -129,7 +144,6 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
         </section>
       )}
 
-      {/* Quick nav (mobile bottom bar style) */}
       <section>
         <h2 className="text-lg font-bold text-brand-navy mb-4">Explore</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

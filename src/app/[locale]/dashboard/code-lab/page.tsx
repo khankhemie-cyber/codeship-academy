@@ -1,19 +1,35 @@
 import { createClient } from '@/lib/supabase/server'
-import { requireRole } from '@/lib/utils/auth'
+import { redirect } from 'next/navigation'
 import CodeLabEditor from '@/components/student/CodeLabEditor'
+import BlocksEnvironment from '@/components/student/BlocksEnvironment'
+import { resolveStudentId } from '@/lib/student-session'
 
-export default async function CodeLabPage() {
+export default async function CodeLabPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
   const supabase = await createClient()
-  const user = await requireRole(supabase, 'student')
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect(`/${locale}/login`)
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id, level')
-    .eq('user_id', user.id)
+  const { data: appUser } = await supabase.from('users').select('role').eq('id', user.id).single()
+  if (!appUser || !['parent', 'admin'].includes(appUser.role)) {
+    redirect(`/${locale}/dashboard`)
+  }
+
+  const studentId = await resolveStudentId(supabase, user.id, appUser.role)
+  if (!studentId) redirect(`/${locale}/dashboard/parent/children`)
+
+  const { data: student } = await supabase
+    .from('student_profiles')
+    .select('level')
+    .eq('id', studentId)
     .single()
 
-  // Explorers (K-3) use block-based; builders+ use text editor
-  const isBlockBased = profile?.level === 'explorers'
+  const level = student?.level || 'explorers'
+  const isBlockBased = level === 'explorers' || level === 'builders'
 
-  return <CodeLabEditor level={profile?.level || 'explorers'} isBlockBased={isBlockBased} />
+  if (isBlockBased) {
+    return <BlocksEnvironment />
+  }
+
+  return <CodeLabEditor level={level} isBlockBased={false} />
 }

@@ -1,105 +1,106 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
-import { requireRole } from '@/lib/utils/auth'
 import { z } from 'zod'
+import { levelFromAge, GRADE_OPTIONS } from '@/lib/utils/user'
 
-const schema = z.object({
-  display_name: z.string().min(2).max(50),
-  date_of_birth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+const PRIVACY_POLICY_VERSION = '2026-04-14'
+const TERMS_VERSION = '2026-04-14'
+
+const CreateStudentSchema = z.object({
+  fullName: z.string().min(2).max(100).trim(),
+  age: z.number().int().min(4).max(18),
+  grade: z.enum(GRADE_OPTIONS),
+  avatarEmoji: z.string().max(8).optional(),
+  aiProcessingAcknowledged: z.literal(true),
+  privacyPolicyVersion: z.string().optional(),
+  termsVersion: z.string().optional(),
 })
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
-  const user = await requireRole(supabase, 'parent').catch(() => null)
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const { data: parentUser } = await supabase
+    .from('users')
+    .select('id, role, email')
+    .eq('id', user.id)
+    .single()
+
+  if (!parentUser || parentUser.role !== 'parent') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   const body = await req.json().catch(() => null)
-  const parsed = schema.safeParse(body)
-  if (!parsed.success) return NextResponse.json({ error: 'Invalid input', issues: parsed.error.issues }, { status: 400 })
-
-  // Check child is under 18
-  const dob = new Date(parsed.data.date_of_birth)
-  const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000))
-  if (age < 4 || age > 17) {
-    return NextResponse.json({ error: 'Child must be between 4 and 17 years old.' }, { status: 400 })
+  const parsed = CreateStudentSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: 'Invalid input', details: parsed.error.flatten() },
+      { status: 400 }
+    )
   }
 
-  const { data: parent } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
+  if (!parsed.data.aiProcessingAcknowledged) {
+    return NextResponse.json(
+      { error: 'Parental consent for AI processing is required.' },
+      { status: 400 }
+    )
+  }
 
-  if (!parent) return NextResponse.json({ error: 'Parent profile not found' }, { status: 404 })
+  const level = levelFromAge(parsed.data.age)
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const ua = req.headers.get('user-agent') ?? 'unknown'
 
-  // Determine level based on age
-  let level: string
-  if (age <= 7) level = 'explorers'
-  else if (age <= 10) level = 'builders'
-  else if (age <= 13) level = 'developers'
-  else level = 'engineers'
-
-  // Use service client to create a new auth user for the child
   const serviceSupabase = await createServiceClient()
-  const childEmail = `child.${Date.now()}.${Math.random().toString(36).slice(2)}@internal.codeship.academy`
-  const childPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2)
 
-  const { data: authData, error: authError } = await serviceSupabase.auth.admin.createUser({
-    email: childEmail,
-    password: childPassword,
-    email_confirm: true,
-    user_metadata: { role: 'student', display_name: parsed.data.display_name },
-  })
-
-  if (authError || !authData.user) {
-    return NextResponse.json({ error: 'Failed to create student account.' }, { status: 500 })
-  }
-
-  // Profile is created by trigger; update it
-  await serviceSupabase
-    .from('profiles')
-    .update({
-      display_name: parsed.data.display_name,
-      role: 'student',
+  const { data: student, error: studentError } = await serviceSupabase
+    .from('student_profiles')
+    .insert({
+      parent_id: user.id,
+      full_name: parsed.data.fullName,
+      age: parsed.data.age,
+      grade: parsed.data.grade,
       level,
-      date_of_birth: parsed.data.date_of_birth,
+      avatar_emoji: parsed.data.avatarEmoji ?? '🚀',
     })
-    .eq('user_id', authData.user.id)
-
-  const { data: studentProfile } = await serviceSupabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', authData.user.id)
+    .select('id, full_name, level')
     .single()
 
-  if (!studentProfile) {
-    return NextResponse.json({ error: 'Profile creation failed.' }, { status: 500 })
+  if (studentError || !student) {
+    console.error('student_profiles insert:', studentError)
+    return NextResponse.json({ error: 'Failed to create student profile.' }, { status: 500 })
   }
 
-  // Link parent to student
-  await serviceSupabase.from('parent_student_links').insert({
-    parent_id: parent.id,
-    student_id: studentProfile.id,
-    consent_given: true,
-    consent_ip: req.headers.get('x-forwarded-for') || 'unknown',
-    consent_ua: req.headers.get('user-agent') || 'unknown',
-  })
-
-  // Record consent
-  await serviceSupabase.from('consent_records').insert({
-    user_id: authData.user.id,
-    consent_type: 'parental',
-    method: 'web_form',
-    ip_address: req.headers.get('x-forwarded-for') || 'unknown',
-    user_agent: req.headers.get('user-agent') || 'unknown',
-    consented_by: user.id,
+  await serviceSupabase.from('parental_consents').insert({
+    parent_user_id: user.id,
+    student_name: parsed.data.fullName,
+    student_age: parsed.data.age,
+    consent_method: 'checkbox_with_policy_link',
+    ip_address: ip,
+    user_agent: ua,
+    privacy_policy_version: parsed.data.privacyPolicyVersion ?? PRIVACY_POLICY_VERSION,
+    data_retention_acknowledged: true,
+    ai_processing_acknowledged: true,
+    marketing_opt_in: false,
   })
 
   await serviceSupabase.from('audit_logs').insert({
     user_id: user.id,
-    action: 'student_created',
-    metadata: { student_id: studentProfile.id, display_name: parsed.data.display_name, level },
+    action: 'student_profile_created',
+    target_type: 'student_profile',
+    target_id: student.id,
+    metadata: {
+      student_name: parsed.data.fullName,
+      level,
+      parent_email: parentUser.email,
+    },
+    ip_address: ip,
+    user_agent: ua,
   })
 
-  return NextResponse.json({ ok: true, student_id: studentProfile.id, level })
+  return NextResponse.json({
+    ok: true,
+    student_id: student.id,
+    level: student.level,
+  })
 }

@@ -58,23 +58,16 @@ export default function SignupPage() {
     }
 
     if (data.user) {
-      // Store email consents
-      const consentTypes = [
-        { type: 'weekly_digest', given: form.weeklyDigest },
-        { type: 'product_updates', given: form.productUpdates },
-        { type: 'promotions', given: form.promotionalOffers },
-        { type: 'school_newsletter', given: form.schoolNewsletter && form.role === 'teacher' },
-      ].filter((c) => c.given)
-
-      if (consentTypes.length > 0) {
-        await supabase.from('email_consents').insert(
-          consentTypes.map((c) => ({
-            user_id: data.user!.id,
-            consent_type: c.type as 'weekly_digest' | 'product_updates' | 'promotions' | 'school_newsletter',
-            consent_method: 'signup_form' as const,
-          }))
-        )
-      }
+      await fetch('/api/auth/consents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          weeklyDigest: form.weeklyDigest,
+          productUpdates: form.productUpdates,
+          promotions: form.promotionalOffers,
+          schoolNewsletter: form.role === 'teacher' && form.schoolNewsletter,
+        }),
+      })
 
       router.push('/en/verify-email')
     }
@@ -162,13 +155,18 @@ export default function SignupPage() {
               <p className="text-xs text-gray-500 mt-1">At least 8 characters</p>
             </div>
 
+            <p className="text-xs text-gray-500 mb-4">
+              By creating an account, you will receive transactional emails (receipts, security alerts,
+              password resets). These cannot be opted out of.
+            </p>
+
             {/* Email preferences — CASL compliant, none pre-ticked */}
             <fieldset className="mb-6 p-4 bg-gray-50 rounded-xl">
               <legend className="text-sm font-bold text-brand-dark mb-3">
                 Email preferences (optional)
               </legend>
               <p className="text-xs text-gray-500 mb-3">
-                You will always receive important account and security emails. These are optional:
+                Optional commercial emails — each requires your express consent:
               </p>
               {[
                 { key: 'weeklyDigest', label: form.role === 'parent' ? 'Weekly progress report for my child' : 'Weekly class summary' },
@@ -183,7 +181,10 @@ export default function SignupPage() {
                     onChange={(e) => update(key, e.target.checked)}
                     className="mt-0.5"
                   />
-                  <span className="text-sm text-gray-700">{label}</span>
+                  <span className="text-sm text-gray-700">
+                    {label}
+                    <em className="text-gray-500"> (you can unsubscribe anytime)</em>
+                  </span>
                 </label>
               ))}
             </fieldset>

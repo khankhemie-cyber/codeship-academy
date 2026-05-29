@@ -29,6 +29,7 @@ function getNavItems(role: string, locale: string): NavItem[] {
   const maps: Record<string, NavItem[]> = {
     parent: [
       { href: `${base}/parent`, label: 'Overview', icon: <Home size={18} /> },
+      { href: `${base}/student`, label: 'Learning', icon: <BookOpen size={18} /> },
       { href: `${base}/parent/children`, label: 'My Children', icon: <Users size={18} /> },
       { href: `${base}/parent/assessment`, label: 'AI Assessment', icon: <GraduationCap size={18} /> },
       { href: `${base}/parent/planner`, label: 'Learning Plan', icon: <ClipboardList size={18} /> },

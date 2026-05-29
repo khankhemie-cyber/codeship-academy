@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import LessonViewer from '@/components/curriculum/LessonViewer'
+import { resolveStudentId } from '@/lib/student-session'
 
 export default async function LessonPage({
   params,
@@ -23,17 +24,11 @@ export default async function LessonPage({
   if (!lesson) notFound()
 
   const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
-  let studentId = user.id
+  const studentId = userData
+    ? await resolveStudentId(supabase, user.id, userData.role)
+    : null
 
-  if (userData?.role === 'parent') {
-    const { data: firstChild } = await supabase
-      .from('student_profiles')
-      .select('id')
-      .eq('parent_id', user.id)
-      .limit(1)
-      .single()
-    studentId = firstChild?.id ?? user.id
-  }
+  if (!studentId) redirect(`/${locale}/dashboard/parent/children`)
 
   const { data: progress } = await supabase
     .from('lesson_progress')

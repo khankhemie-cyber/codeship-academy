@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { resolveStudentId } from '@/lib/student-session'
 
 const LEVEL_META: Record<string, { emoji: string; label: string; grades: string }> = {
   explorers:  { emoji: '🌱', label: 'Explorers',  grades: 'K–1' },
@@ -31,18 +32,11 @@ export default async function CurriculumPage({
   if (!user) redirect(`/${locale}/login`)
 
   const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
-  let studentId = user.id
+  const studentId = userData
+    ? await resolveStudentId(supabase, user.id, userData.role)
+    : null
 
-  // For parents, get the first child
-  if (userData?.role === 'parent') {
-    const { data: firstChild } = await supabase
-      .from('student_profiles')
-      .select('id')
-      .eq('parent_id', user.id)
-      .limit(1)
-      .single()
-    studentId = firstChild?.id ?? user.id
-  }
+  if (!studentId) redirect(`/${locale}/dashboard/parent/children`)
 
   // Fetch curriculum items
   const table = type === 'projects' ? 'projects' : type === 'quizzes' ? 'quizzes' : 'lessons'

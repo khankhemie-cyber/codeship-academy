@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
-  if (userData?.role !== 'student' && userData?.role !== 'admin') {
-    return NextResponse.json({ error: 'Students only' }, { status: 403 })
+  if (!userData || !['parent', 'admin'].includes(userData.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   // Rate limiting: check requests in last hour

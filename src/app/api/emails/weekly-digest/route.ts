@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
+import { createUnsubscribeToken } from '@/lib/utils/unsubscribe-token'
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -58,6 +59,9 @@ export async function GET(request: NextRequest) {
           ? `Rapport hebdomadaire de ${student.full_name}`
           : `${student.full_name}'s Weekly Progress Report`
 
+        const unsubscribeToken = await createUnsubscribeToken(userId, 'weekly_digest')
+        const unsubscribeUrl = `${appUrl}/api/unsubscribe?type=weekly_digest&token=${encodeURIComponent(unsubscribeToken)}`
+
         const html = `
 <!DOCTYPE html>
 <html lang="${locale}">
@@ -105,7 +109,7 @@ export async function GET(request: NextRequest) {
 
     <p style="font-size: 11px; color: #9ca3af; text-align: center;">
       CODEship Academy Inc., 21 Simcoe St S, Oshawa, ON L1H 4G2<br>
-      <a href="${appUrl}/api/unsubscribe?type=weekly_digest&token=UNSUBSCRIBE_TOKEN" style="color: #9ca3af;">
+      <a href="${unsubscribeUrl}" style="color: #9ca3af;">
         ${isFr ? 'Se désabonner' : 'Unsubscribe from weekly digest'}
       </a>
     </p>
