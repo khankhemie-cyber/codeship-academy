@@ -72,9 +72,9 @@ export async function POST(request: NextRequest) {
     })
   }
 
-  // Award XP if completed
   if (status === 'completed') {
     await supabase.rpc('award_xp', { p_student_id: studentId, p_base_xp: 100 })
+    await supabase.rpc('update_streak', { p_student_id: studentId })
   }
 
   return NextResponse.json({ success: true })

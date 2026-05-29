@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { checkRateLimit } from '@/lib/rate-limit'
 import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
 
@@ -17,6 +18,11 @@ export async function POST(request: NextRequest) {
   const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
   if (userData?.role !== 'parent' && userData?.role !== 'admin') {
     return NextResponse.json({ error: 'Parents only' }, { status: 403 })
+  }
+
+  const rate = await checkRateLimit(user.id, 'ai_planner', 10, 86400)
+  if (!rate.allowed) {
+    return NextResponse.json({ error: 'Daily planner limit reached. Try again tomorrow.' }, { status: 429 })
   }
 
   let body: unknown

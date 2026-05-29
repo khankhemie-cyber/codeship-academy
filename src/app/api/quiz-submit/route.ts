@@ -145,6 +145,7 @@ export async function POST(req: NextRequest) {
       p_student_id: studentId,
       p_base_xp: quiz.xp_reward,
     })
+    await supabase.rpc('update_streak', { p_student_id: studentId })
     xp_awarded = typeof xpResult === 'number' ? xpResult : quiz.xp_reward
     await supabase.from('audit_logs').insert({
       user_id: user.id,

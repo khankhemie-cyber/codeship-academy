@@ -156,3 +156,76 @@ CREATE INDEX IF NOT EXISTS idx_student_profiles_xp      ON public.student_profil
 CREATE INDEX IF NOT EXISTS idx_lesson_progress_completed ON public.lesson_progress(student_id, completed_at DESC)
   WHERE status = 'completed';
 CREATE INDEX IF NOT EXISTS idx_quiz_attempts_passed      ON public.quiz_attempts(student_id, passed);
+
+-- =============================================================================
+-- 5. RATE LIMIT LOG (AI + auth endpoints)
+-- =============================================================================
+
+CREATE TABLE IF NOT EXISTS public.rate_limit_log (
+  id         uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id    uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  action     text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_rate_limit_log_user_action
+  ON public.rate_limit_log(user_id, action, created_at DESC);
+
+ALTER TABLE public.rate_limit_log ENABLE ROW LEVEL SECURITY;
+
+-- Service role only (API routes use service client for inserts/counts)
+CREATE POLICY "rate_limit_log: service only"
+  ON public.rate_limit_log FOR ALL
+  USING (false)
+  WITH CHECK (false);
+
+-- =============================================================================
+-- 6. update_streak — call after lesson/quiz completion
+-- =============================================================================
+
+CREATE OR REPLACE FUNCTION public.update_streak(p_student_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_last      date;
+  v_streak    int;
+  v_multiplier numeric;
+BEGIN
+  SELECT (updated_at AT TIME ZONE 'UTC')::date, streak_days
+  INTO   v_last, v_streak
+  FROM   public.student_profiles
+  WHERE  id = p_student_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Student % not found', p_student_id;
+  END IF;
+
+  IF v_last = (now() AT TIME ZONE 'UTC')::date THEN
+    RETURN;
+  END IF;
+
+  IF v_last = (now() AT TIME ZONE 'UTC')::date - 1 THEN
+    v_streak := v_streak + 1;
+  ELSE
+    v_streak := 1;
+  END IF;
+
+  IF v_streak >= 30 THEN
+    v_multiplier := 2.0;
+  ELSIF v_streak >= 14 THEN
+    v_multiplier := 1.5;
+  ELSIF v_streak >= 7 THEN
+    v_multiplier := 1.25;
+  ELSE
+    v_multiplier := 1.0;
+  END IF;
+
+  UPDATE public.student_profiles
+  SET    streak_days   = v_streak,
+         xp_multiplier = v_multiplier,
+         updated_at    = now()
+  WHERE  id = p_student_id;
+END;
+$$;
