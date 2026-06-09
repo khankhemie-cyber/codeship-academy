@@ -10,62 +10,6 @@ export type WithdrawMethod = 'unsubscribe_link' | 'settings' | 'admin_request'
 export interface Database {
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          id: string
-          user_id: string
-          display_name: string | null
-          role: UserRole
-          level: string | null
-          date_of_birth: string | null
-          avatar_url: string | null
-          stripe_customer_id: string | null
-          subscription_plan: string | null
-          subscription_status: string | null
-          trial_ends_at: string | null
-          total_xp: number
-          current_streak: number
-          leaderboard_opt_out: boolean
-          deletion_requested_at: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          display_name?: string | null
-          role?: UserRole
-          level?: string | null
-          date_of_birth?: string | null
-          avatar_url?: string | null
-          stripe_customer_id?: string | null
-          subscription_plan?: string | null
-          subscription_status?: string | null
-          trial_ends_at?: string | null
-          total_xp?: number
-          current_streak?: number
-          leaderboard_opt_out?: boolean
-          deletion_requested_at?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          display_name?: string | null
-          role?: UserRole
-          level?: string | null
-          date_of_birth?: string | null
-          avatar_url?: string | null
-          stripe_customer_id?: string | null
-          subscription_plan?: string | null
-          subscription_status?: string | null
-          trial_ends_at?: string | null
-          total_xp?: number
-          current_streak?: number
-          leaderboard_opt_out?: boolean
-          deletion_requested_at?: string | null
-          updated_at?: string
-        }
-      }
       users: {
         Row: {
           id: string

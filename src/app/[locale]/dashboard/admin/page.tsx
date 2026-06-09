@@ -6,23 +6,26 @@ export default async function AdminDashboardPage({ params }: { params: { locale:
   const supabase = await createClient()
   await requireRole(supabase, 'admin')
 
-  const [usersRes, subscriptionsRes, recentAuditRes] = await Promise.all([
-    supabase.from('profiles').select('role, subscription_status, created_at'),
-    supabase.from('profiles').select('subscription_plan, subscription_status').neq('subscription_plan', 'free'),
+  const [usersRes, subscriptionsRes, studentsRes, recentAuditRes] = await Promise.all([
+    supabase.from('users').select('role', { count: 'exact', head: true }),
+    supabase.from('subscriptions').select('plan, status'),
+    supabase.from('student_profiles').select('id', { count: 'exact', head: true }),
     supabase.from('audit_logs').select('action, created_at, user_id').order('created_at', { ascending: false }).limit(20),
   ])
 
-  const users = usersRes.data || []
-  const totalUsers = users.length
-  const students = users.filter((u: any) => u.role === 'student').length
-  const parents = users.filter((u: any) => u.role === 'parent').length
-  const teachers = users.filter((u: any) => u.role === 'teacher').length
-  const activeSubscriptions = (subscriptionsRes.data || []).filter((s: any) => s.subscription_status === 'active').length
-  const trialing = (subscriptionsRes.data || []).filter((s: any) => s.subscription_status === 'trialing').length
+  const { count: totalUsers } = usersRes
+  const { count: students } = studentsRes
+  const roleCounts = await supabase.from('users').select('role')
+  const users = roleCounts.data || []
+  const parents = users.filter((u) => u.role === 'parent').length
+  const teachers = users.filter((u) => u.role === 'teacher').length
+  const subs = subscriptionsRes.data || []
+  const activeSubscriptions = subs.filter((s) => s.status === 'active').length
+  const trialing = subs.filter((s) => s.status === 'trial').length
 
   const adminCards = [
-    { title: 'Total Users', value: totalUsers, color: 'text-brand-navy', icon: '👥' },
-    { title: 'Students', value: students, color: 'text-green-600', icon: '🎓' },
+    { title: 'Total Users', value: totalUsers ?? 0, color: 'text-brand-navy', icon: '👥' },
+    { title: 'Student Profiles', value: students ?? 0, color: 'text-green-600', icon: '🎓' },
     { title: 'Parents', value: parents, color: 'text-blue-600', icon: '👨‍👩‍👧' },
     { title: 'Teachers', value: teachers, color: 'text-purple-600', icon: '👩‍🏫' },
     { title: 'Active Subscriptions', value: activeSubscriptions, color: 'text-brand-gold', icon: '💳' },

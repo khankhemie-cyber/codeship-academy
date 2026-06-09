@@ -119,10 +119,9 @@ of the CODEship logo and it generates all sizes including maskable variants.
 ## Supabase Setup
 
 1. Create project at https://app.supabase.com
-2. Run SQL files in order:
+2. Run SQL files in order (or use `npm run db:push` after setting `DATABASE_URL`):
    ```
    supabase/schema.sql
-   supabase/patch.sql
    supabase/curriculum.sql
    supabase/curriculum-explorers.sql
    supabase/curriculum-explorers-projects.sql
@@ -134,6 +133,7 @@ of the CODEship logo and it generates all sizes including maskable variants.
    supabase/curriculum-developers-quizzes.sql
    supabase/classes.sql
    supabase/school-portal.sql
+   supabase/patch.sql
    ```
 3. Enable Row Level Security on all tables (should already be in schema.sql).
 4. Under **Authentication → URL Configuration**, set:
@@ -153,13 +153,13 @@ of the CODEship logo and it generates all sizes including maskable variants.
 
 ## Local Development
 
+See **[SETUP.md](./SETUP.md)** for the full guide. Quick start:
+
 ```bash
-cp .env.example .env.local
-# fill in .env.local with real dev keys
-
-npm install
-npm run dev          # http://localhost:3000
-
-# In a separate terminal — forward Stripe webhooks locally:
-stripe listen --forward-to localhost:3000/api/stripe/webhook
+npm run setup        # install deps, create .env.local, verify build
+# configure Supabase keys in .env.local
+npm run db:push      # apply all SQL
+npm run dev:all      # Next.js + Stripe webhook forwarder
 ```
+
+Open http://localhost:3000/en

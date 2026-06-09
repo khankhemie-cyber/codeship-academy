@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { requireRole } from '@/lib/utils/auth'
+import { resolveStudentId, verifyStudentAccess } from '@/lib/student-session'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -11,20 +11,21 @@ const schema = z.object({
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
-  const user = await requireRole(supabase, 'student').catch(() => null)
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { data: appUser } = await supabase.from('users').select('role').eq('id', user.id).single()
+  if (!appUser) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+  const studentId = await resolveStudentId(supabase, user.id, appUser.role)
+  if (!studentId) return NextResponse.json({ error: 'No active student' }, { status: 400 })
+
+  const allowed = await verifyStudentAccess(supabase, user.id, appUser.role, studentId)
+  if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await req.json().catch(() => null)
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .single()
-
-  if (!profile) return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
 
   const { data: project } = await supabase
     .from('projects')
@@ -38,19 +39,21 @@ export async function POST(req: NextRequest) {
     .from('project_submissions')
     .select('id')
     .eq('project_id', parsed.data.project_id)
-    .eq('student_id', profile.id)
+    .eq('student_id', studentId)
     .maybeSingle()
+
+  const payload = {
+    code_snapshot: parsed.data.code,
+    notes: parsed.data.notes || null,
+    status: 'submitted',
+    updated_at: new Date().toISOString(),
+  }
 
   let submission
   if (existing) {
     const { data } = await supabase
       .from('project_submissions')
-      .update({
-        code: parsed.data.code,
-        notes: parsed.data.notes || null,
-        status: 'submitted',
-        submitted_at: new Date().toISOString(),
-      })
+      .update(payload)
       .eq('id', existing.id)
       .select()
       .single()
@@ -60,22 +63,16 @@ export async function POST(req: NextRequest) {
       .from('project_submissions')
       .insert({
         project_id: parsed.data.project_id,
-        student_id: profile.id,
-        code: parsed.data.code,
-        notes: parsed.data.notes || null,
-        status: 'submitted',
-        submitted_at: new Date().toISOString(),
+        student_id: studentId,
+        ...payload,
       })
       .select()
       .single()
     submission = data
 
-    // Award XP on first submission
     await supabase.rpc('award_xp', {
-      p_student_id: profile.id,
-      p_xp: project.xp_reward,
-      p_source: 'project',
-      p_source_id: parsed.data.project_id,
+      p_student_id: studentId,
+      p_base_xp: project.xp_reward,
     })
   }
 

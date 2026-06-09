@@ -4,12 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:all": "bash scripts/dev-all.sh",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "typecheck": "tsc --noEmit",
     "build:check": "npm run typecheck && npm run lint && npm run build",
+    "setup": "bash scripts/setup-all.sh",
+    "env:check": "bash scripts/verify-env.sh",
+    "db:push": "bash scripts/db-push.sh",
+    "db:link": "bash scripts/link-supabase.sh",
+    "vercel:link": "bash scripts/link-vercel.sh",
     "analyze": "ANALYZE=true next build"
   },
   "dependencies": {
@@ -40,6 +46,7 @@
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.4",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vercel": "^54.10.2"
   }
 }

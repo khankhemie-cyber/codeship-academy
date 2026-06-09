@@ -14,13 +14,13 @@ export default async function AdminUsersPage({
   const offset = (page - 1) * perPage
 
   let query = supabase
-    .from('profiles')
-    .select('id, user_id, display_name, role, level, subscription_plan, subscription_status, created_at, deletion_requested_at', { count: 'exact' })
+    .from('users')
+    .select('id, email, full_name, role, locale, created_at, deleted_at', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(offset, offset + perPage - 1)
 
   if (searchParams.role) query = query.eq('role', searchParams.role)
-  if (searchParams.q) query = query.ilike('display_name', `%${searchParams.q}%`)
+  if (searchParams.q) query = query.ilike('full_name', `%${searchParams.q}%`)
 
   const { data: users, count } = await query
   const totalPages = Math.ceil((count || 0) / perPage)
@@ -61,20 +61,18 @@ export default async function AdminUsersPage({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {(users || []).map((u: any) => (
-              <tr key={u.id} className={u.deletion_requested_at ? 'bg-red-50' : ''}>
+            {(users || []).map((u: { id: string; full_name: string | null; email: string; role: string; deleted_at: string | null; created_at: string }) => (
+              <tr key={u.id} className={u.deleted_at ? 'bg-red-50' : ''}>
                 <td className="px-4 py-3">
-                  <span className="font-medium text-gray-900">{u.display_name || '—'}</span>
-                  {u.deletion_requested_at && <span className="ml-2 text-xs text-red-500">⚠️ Deletion requested</span>}
+                  <span className="font-medium text-gray-900">{u.full_name || u.email}</span>
+                  {u.deleted_at && <span className="ml-2 text-xs text-red-500">Deletion scheduled</span>}
                 </td>
                 <td className="px-4 py-3">
                   <span className="badge badge-gray capitalize">{u.role}</span>
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-500 capitalize">{u.subscription_plan || 'free'}</td>
+                <td className="px-4 py-3 text-sm text-gray-500">—</td>
                 <td className="px-4 py-3">
-                  <span className={`badge ${u.subscription_status === 'active' ? 'badge-green' : u.subscription_status === 'trialing' ? 'badge-blue' : 'badge-gray'} capitalize`}>
-                    {u.subscription_status || 'none'}
-                  </span>
+                  <span className="badge badge-gray capitalize">{u.deleted_at ? 'pending delete' : 'active'}</span>
                 </td>
                 <td className="px-4 py-3 text-right text-sm text-gray-500">
                   {new Date(u.created_at).toLocaleDateString('en-CA')}

@@ -17,7 +17,7 @@ export default async function CurriculumCMSPage({ searchParams }: { searchParams
   if (type === 'lessons') {
     const res = await supabase
       .from('lessons')
-      .select('id, slug, title, category, duration_minutes, sort_order, is_published', { count: 'exact' })
+      .select('id, slug, title, category, duration_minutes, sort_order, is_visible', { count: 'exact' })
       .eq('level', level)
       .order('sort_order', { ascending: true })
     data = res.data || []
@@ -25,7 +25,7 @@ export default async function CurriculumCMSPage({ searchParams }: { searchParams
   } else if (type === 'projects') {
     const res = await supabase
       .from('projects')
-      .select('id, slug, title, difficulty, duration_minutes, sort_order, is_published', { count: 'exact' })
+      .select('id, slug, title, difficulty, duration_minutes, sort_order, is_visible', { count: 'exact' })
       .eq('level', level)
       .order('sort_order', { ascending: true })
     data = res.data || []
@@ -99,7 +99,7 @@ export default async function CurriculumCMSPage({ searchParams }: { searchParams
                 </td>
                 {type !== 'quizzes' && (
                   <td className="px-4 py-2 text-center">
-                    <span className={`inline-block w-2 h-2 rounded-full ${item.is_published ? 'bg-green-500' : 'bg-gray-300'}`} />
+                    <span className={`inline-block w-2 h-2 rounded-full ${item.is_visible ? 'bg-green-500' : 'bg-gray-300'}`} />
                   </td>
                 )}
                 <td className="px-4 py-2 text-right">

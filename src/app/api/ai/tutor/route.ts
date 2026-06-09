@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { checkRateLimit } from '@/lib/rate-limit'
 import Anthropic from '@anthropic-ai/sdk'
 import { z } from 'zod'
 
@@ -28,20 +29,12 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
-  if (userData?.role !== 'student' && userData?.role !== 'admin') {
-    return NextResponse.json({ error: 'Students only' }, { status: 403 })
+  if (!userData || !['parent', 'admin'].includes(userData.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  // Rate limiting: check requests in last hour
-  const oneHourAgo = new Date(Date.now() - 3600000).toISOString()
-  const { count } = await supabase
-    .from('audit_logs')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user.id)
-    .eq('action', 'ai_tutor_request')
-    .gte('created_at', oneHourAgo)
-
-  if ((count ?? 0) >= 20) {
+  const rate = await checkRateLimit(user.id, 'ai_tutor', 20, 3600)
+  if (!rate.allowed) {
     return NextResponse.json({ error: 'Rate limit reached. Try again in an hour.' }, { status: 429 })
   }
 

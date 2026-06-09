@@ -1,12 +1,19 @@
-import { SignJWT } from 'jose'
+import { SignJWT, jwtVerify } from 'jose'
 
-const SECRET = new TextEncoder().encode(process.env.CRON_SECRET ?? 'fallback-secret-change-in-prod')
+const secret = new TextEncoder().encode(
+  process.env.CRON_SECRET ?? process.env.UNSUBSCRIBE_SECRET ?? 'dev-unsubscribe-secret-change-me'
+)
 
-export async function signUnsubscribeToken(userId: string, consentType: string): Promise<string> {
+export const UNSUBSCRIBE_SECRET = secret
+
+export async function createUnsubscribeToken(userId: string, consentType: string) {
   return new SignJWT({ userId, consentType })
     .setProtectedHeader({ alg: 'HS256' })
-    .setExpirationTime('60d')
-    .sign(SECRET)
+    .setExpirationTime('90d')
+    .sign(secret)
 }
 
-export { SECRET as UNSUBSCRIBE_SECRET }
+export async function verifyUnsubscribeToken(token: string) {
+  const { payload } = await jwtVerify(token, secret)
+  return payload as { userId: string; consentType: string }
+}

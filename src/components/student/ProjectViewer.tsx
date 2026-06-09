@@ -19,10 +19,10 @@ interface Project {
 
 interface Submission {
   id: string
-  code: string
+  code_snapshot: string | null
   notes: string | null
   status: string
-  submitted_at: string
+  created_at: string
 }
 
 interface Props {
@@ -35,7 +35,9 @@ interface Props {
 export default function ProjectViewer({ project, studentId, existingSubmission, locale }: Props) {
   const router = useRouter()
   const [tab, setTab] = useState<'instructions' | 'code' | 'preview'>('instructions')
-  const [code, setCode] = useState(existingSubmission?.code || project.starter_code || '')
+  const [code, setCode] = useState(
+    existingSubmission?.code_snapshot || project.starter_code || ''
+  )
   const [notes, setNotes] = useState(existingSubmission?.notes || '')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(!!existingSubmission)
