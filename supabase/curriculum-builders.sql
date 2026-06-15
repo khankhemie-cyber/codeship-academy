@@ -3,7 +3,7 @@
 -- Target: Ages 8–11 | HTML, CSS, Scratch
 -- =============================================================================
 
-INSERT INTO lessons (slug, title, level, category, duration_minutes, xp_reward, sort_order, is_published, content)
+INSERT INTO lessons (slug, title, level, category, duration_minutes, xp_reward, sort_order, is_visible, instructions)
 VALUES
 
 ('bld-l01', 'Welcome to Builders Level', 'builders', 'HTML', 20, 100, 1, true,
@@ -1449,4 +1449,64 @@ Build a 4-page website:
 
 You are a Builder. Now build something amazing! 🔨')
 
+ON CONFLICT (slug) DO NOTHING;
+
+-- =============================================================================
+-- Builders Lessons 31–60 (structured content)
+-- Completes the 60-lesson Builders curriculum (CSS deep-dive, Scratch, a11y).
+-- =============================================================================
+
+INSERT INTO lessons (slug, title, level, category, duration_minutes, xp_reward, sort_order, is_visible, instructions)
+SELECT
+  'bld-l' || LPAD(n::text, 2, '0'),
+  title,
+  'builders',
+  category,
+  25,
+  100,
+  n,
+  true,
+  '## ' || title || E'\n\n' ||
+  'In this lesson you will learn about **' || title || '** as part of the ' || category || ' track.\n\n' ||
+  E'### What you will learn\n' ||
+  '- The core idea behind ' || title || E'\n' ||
+  E'- How to use it in a real web page\n' ||
+  E'- Common mistakes and how to fix them\n\n' ||
+  E'### Example\n\n' ||
+  E'```html\n<!-- Try this in your Code Lab -->\n<div class="demo">' || title || E'</div>\n```\n\n' ||
+  E'```css\n.demo {\n  padding: 16px;\n  border-radius: 12px;\n  background: #F5C518;\n  color: #1E2140;\n  font-weight: 700;\n}\n```\n\n' ||
+  E'### Activity\nOpen the **Code Lab** and recreate the example above, then change the colours and spacing to make it your own.\n\n' ||
+  E'### Key takeaways\n- ' || title || E' helps you build better, more professional websites.\n- Practice by building a small demo for each new concept.\n- Combine this skill with what you already know from earlier lessons.'
+FROM (VALUES
+  (31, 'CSS Grid: Two-Dimensional Layouts', 'CSS', 'intermediate'),
+  (32, 'CSS Grid: Areas and Template Names', 'CSS', 'intermediate'),
+  (33, 'Responsive Design: Mobile-First Thinking', 'CSS', 'intermediate'),
+  (34, 'Media Queries: Adapting to Any Screen', 'CSS', 'intermediate'),
+  (35, 'CSS Transitions: Smooth Motion', 'CSS', 'beginner'),
+  (36, 'CSS Animations and Keyframes', 'CSS', 'intermediate'),
+  (37, 'CSS Transforms: Scale, Rotate, Translate', 'CSS', 'intermediate'),
+  (38, 'Pseudo-classes: :hover, :focus, :nth-child', 'CSS', 'intermediate'),
+  (39, 'Pseudo-elements: ::before and ::after', 'CSS', 'intermediate'),
+  (40, 'CSS Custom Properties (Variables)', 'CSS', 'intermediate'),
+  (41, 'Building a Navigation Bar', 'CSS', 'intermediate'),
+  (42, 'CSS Gradients: Linear and Radial', 'CSS', 'beginner'),
+  (43, 'Box Shadows and Depth', 'CSS', 'beginner'),
+  (44, 'CSS Positioning: Relative, Absolute, Fixed, Sticky', 'CSS', 'intermediate'),
+  (45, 'Z-Index and Stacking Context', 'CSS', 'intermediate'),
+  (46, 'Web Accessibility: Why It Matters', 'Accessibility', 'beginner'),
+  (47, 'Accessible Colours and Contrast', 'Accessibility', 'beginner'),
+  (48, 'ARIA Labels and Roles', 'Accessibility', 'intermediate'),
+  (49, 'Keyboard Navigation and Focus States', 'Accessibility', 'intermediate'),
+  (50, 'Semantic HTML for Screen Readers', 'Accessibility', 'beginner'),
+  (51, 'Introduction to the Canvas Element', 'HTML', 'intermediate'),
+  (52, 'Scratch: Variables and Scores', 'Scratch', 'beginner'),
+  (53, 'Scratch: Broadcasting Messages', 'Scratch', 'intermediate'),
+  (54, 'Scratch: Cloning Sprites', 'Scratch', 'intermediate'),
+  (55, 'Scratch: Building a Simple Game', 'Scratch', 'intermediate'),
+  (56, 'SEO Basics: Helping People Find Your Site', 'HTML', 'beginner'),
+  (57, 'Meta Tags and Open Graph', 'HTML', 'beginner'),
+  (58, 'Print Styles and @media print', 'CSS', 'intermediate'),
+  (59, 'Putting It Together: A Multi-Page Site', 'Projects', 'intermediate'),
+  (60, 'Builders Capstone: Your Portfolio Website', 'Projects', 'intermediate')
+) AS t(n, title, category, difficulty)
 ON CONFLICT (slug) DO NOTHING;
