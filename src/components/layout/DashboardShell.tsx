@@ -57,7 +57,7 @@ function getNavItems(role: string, locale: string): NavItem[] {
       { href: `${base}/admin/users`, label: 'Users', icon: <Users size={18} /> },
       { href: `${base}/admin/analytics`, label: 'Analytics', icon: <BarChart3 size={18} /> },
       { href: `${base}/admin/curriculum`, label: 'Curriculum', icon: <BookOpen size={18} /> },
-      { href: `${base}/admin/audit`, label: 'Audit Log', icon: <ClipboardList size={18} /> },
+      { href: `${base}/admin/audit-log`, label: 'Audit Log', icon: <ClipboardList size={18} /> },
       { href: `${base}/admin/subscriptions`, label: 'Subscriptions', icon: <Star size={18} /> },
       { href: `${base}/settings`, label: 'Settings', icon: <Settings size={18} /> },
     ],

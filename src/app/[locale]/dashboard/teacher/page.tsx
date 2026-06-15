@@ -11,10 +11,16 @@ export default async function TeacherDashboard({ params }: { params: Promise<{ l
   const { data: userData } = await supabase.from('users').select('*').eq('id', user.id).single()
   if (userData?.role !== 'teacher' && userData?.role !== 'admin') redirect(`/${locale}/dashboard`)
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+
   const { data: classes } = await supabase
     .from('classes')
     .select('*, class_memberships(count)')
-    .eq('teacher_id', user.id)
+    .eq('teacher_id', profile?.id ?? '00000000-0000-0000-0000-000000000000')
     .eq('is_active', true)
 
   const { data: teacherProfile } = await supabase
@@ -65,7 +71,7 @@ export default async function TeacherDashboard({ params }: { params: Promise<{ l
               <div key={cls.id} className="card hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="font-bold text-brand-navy">{cls.name}</h3>
-                  <span className="badge badge-navy font-mono text-xs tracking-widest">{cls.code}</span>
+                  <span className="badge badge-navy font-mono text-xs tracking-widest">{cls.join_code}</span>
                 </div>
                 <div className="text-sm text-gray-500 mb-4">
                   Grade {cls.grade} · {cls.class_memberships?.[0]?.count ?? 0} students
@@ -99,7 +105,7 @@ export default async function TeacherDashboard({ params }: { params: Promise<{ l
             { href: `/${locale}/dashboard/classes`, icon: '👥', label: 'Manage Classes' },
             { href: `/${locale}/dashboard/reports`, icon: '📊', label: 'Quiz Reports' },
             { href: `/${locale}/dashboard/school`, icon: '🏫', label: 'School Portal' },
-            { href: `/${locale}/dashboard/school/impact`, icon: '📈', label: 'Impact Report' },
+            { href: `/${locale}/dashboard/school/reports`, icon: '📈', label: 'Impact Report' },
           ].map((action) => (
             <Link key={action.href} href={action.href} className="card text-center hover:shadow-md transition-shadow">
               <div className="text-3xl mb-2">{action.icon}</div>

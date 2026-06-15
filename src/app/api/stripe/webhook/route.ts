@@ -36,6 +36,12 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' })
 
+      await supabase.from('profiles').update({
+        stripe_customer_id: session.customer as string,
+        subscription_plan: plan,
+        subscription_status: 'active',
+      }).eq('user_id', userId)
+
       await supabase.from('audit_logs').insert({
         user_id: userId,
         action: 'subscription_activated',
@@ -64,6 +70,11 @@ export async function POST(request: NextRequest) {
         current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' })
+
+      await supabase.from('profiles').update({
+        subscription_plan: plan,
+        subscription_status: status,
+      }).eq('user_id', userId)
       break
     }
 
@@ -79,6 +90,33 @@ export async function POST(request: NextRequest) {
         status: 'cancelled' as any,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'user_id' })
+
+      await supabase.from('profiles').update({
+        subscription_plan: 'trial',
+        subscription_status: 'cancelled',
+      }).eq('user_id', userId)
+      break
+    }
+
+    case 'invoice.payment_succeeded': {
+      const invoice = event.data.object as Stripe.Invoice
+      const customerId = invoice.customer as string
+
+      const { data: sub } = await supabase
+        .from('subscriptions')
+        .select('user_id')
+        .eq('stripe_customer_id', customerId)
+        .single()
+
+      if (sub) {
+        await supabase.from('payments').insert({
+          user_id: sub.user_id,
+          stripe_invoice_id: invoice.id,
+          amount: invoice.amount_paid,
+          currency: invoice.currency ?? 'cad',
+          status: 'paid',
+        })
+      }
       break
     }
 
@@ -94,6 +132,7 @@ export async function POST(request: NextRequest) {
 
       if (sub) {
         await supabase.from('subscriptions').update({ status: 'past_due', updated_at: new Date().toISOString() }).eq('user_id', sub.user_id)
+        await supabase.from('profiles').update({ subscription_status: 'past_due' }).eq('user_id', sub.user_id)
       }
       break
     }

@@ -68,7 +68,7 @@ FROM quizzes q, (VALUES
   ('dev-q01', 'Which is NOT a JavaScript data type?', '["string","number","boolean","character"]', 3, 'JS has: string, number, boolean, null, undefined, object, symbol. Not "character".', 6),
   ('dev-q01', 'JavaScript was created by:', '["Tim Berners-Lee","Brendan Eich","Linus Torvalds","James Gosling"]', 1, 'Brendan Eich created JavaScript in 1995 in just 10 days!', 7),
   ('dev-q01', 'JavaScript runs in:', '["Only servers","Only browsers","Both browsers and servers (via Node.js)","Only mobile apps"]', 2, 'JavaScript originally ran in browsers, now also on servers via Node.js.', 8),
-  ('dev-q01', 'The strict mode declaration is:', '["""use strict"";","strict mode;","#strict","enable strict;"]', 0, '"use strict"; enables strict mode at the top of a file or function.', 9),
+  ('dev-q01', 'The strict mode declaration is:', '["\"use strict\";","strict mode;","#strict","enable strict;"]', 0, '"use strict"; enables strict mode at the top of a file or function.', 9),
   ('dev-q01', 'Which statement is correct about JavaScript?', '["It is the same as Java","It is case-sensitive","It uses indentation for code blocks","It requires semicolons always"]', 1, 'JavaScript is case-sensitive: myVar and myvar are different variables.', 10)
 ) AS qq(quiz_slug, question, options, correct_answer, explanation, sort_order)
 WHERE q.slug = qq.quiz_slug

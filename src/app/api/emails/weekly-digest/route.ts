@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
+import { signUnsubscribeToken } from '@/lib/utils/unsubscribe-token'
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -30,6 +31,7 @@ export async function GET(request: NextRequest) {
     try {
       const userId = consent.user_id
       const userRecord = (consent as any).users
+      const unsubscribeToken = await signUnsubscribeToken(userId, 'weekly_digest')
 
       // Get children
       const { data: students } = await supabase
@@ -95,17 +97,17 @@ export async function GET(request: NextRequest) {
     </ul>` : `<p style="color: #6b7280;">${isFr ? 'Pas de leçons cette semaine — encouragez-les à commencer!' : 'No lessons this week — encourage them to start!'}</p>`}
 
     <div style="margin: 24px 0; text-align: center;">
-      <a href="${appUrl}/en/dashboard/parent"
+      <a href="${appUrl}/${locale}/dashboard/parent/progress"
          style="background: #F5C518; color: #1E2140; font-weight: 700; padding: 14px 28px; border-radius: 12px; text-decoration: none; display: inline-block;">
-        ${isFr ? 'Voir le tableau de bord complet →' : 'View Full Dashboard →'}
+        ${isFr ? 'Voir le rapport complet →' : 'View Full Report →'}
       </a>
     </div>
 
     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
 
     <p style="font-size: 11px; color: #9ca3af; text-align: center;">
-      CODEship Academy Inc., 21 Simcoe St S, Oshawa, ON L1H 4G2<br>
-      <a href="${appUrl}/api/unsubscribe?type=weekly_digest&token=UNSUBSCRIBE_TOKEN" style="color: #9ca3af;">
+      CODEship Academy Inc., 21 Simcoe Street South, Oshawa, Ontario, L1H 4G1<br>
+      <a href="${appUrl}/api/unsubscribe?type=weekly_digest&token=${unsubscribeToken}" style="color: #9ca3af;">
         ${isFr ? 'Se désabonner' : 'Unsubscribe from weekly digest'}
       </a>
     </p>

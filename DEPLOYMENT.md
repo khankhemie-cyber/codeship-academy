@@ -119,23 +119,23 @@ of the CODEship logo and it generates all sizes including maskable variants.
 ## Supabase Setup
 
 1. Create project at https://app.supabase.com
-2. Run SQL files in order:
+2. Run SQL files **in this exact order** (in the Supabase SQL Editor or via `psql`):
    ```
-   supabase/schema.sql
-   supabase/patch.sql
-   supabase/curriculum.sql
-   supabase/curriculum-explorers.sql
-   supabase/curriculum-explorers-projects.sql
-   supabase/curriculum-builders.sql
-   supabase/curriculum-builders-quizzes.sql
-   supabase/curriculum-builders-quizzes-complete.sql
-   supabase/curriculum-builders-projects.sql
-   supabase/curriculum-developers.sql
-   supabase/curriculum-developers-quizzes.sql
-   supabase/classes.sql
-   supabase/school-portal.sql
+   supabase/schema.sql                         # tables, RLS, triggers, RPCs, seeds
+   supabase/curriculum-explorers.sql           # 25 lessons (K–1)
+   supabase/curriculum-explorers-projects.sql  # 100 projects
+   supabase/curriculum-builders.sql            # 60 lessons (Gr 2–3)
+   supabase/curriculum-builders-projects.sql   # 100 projects
+   supabase/curriculum-builders-quizzes.sql    # quizzes Q1–Q16
+   supabase/curriculum-builders-quizzes-complete.sql  # quizzes Q17–Q50 (500 Q total)
+   supabase/curriculum-developers.sql          # 100 lessons + 100 projects (Gr 4–6)
+   supabase/curriculum-developers-quizzes.sql  # 50 quizzes / 500 questions
    ```
-3. Enable Row Level Security on all tables (should already be in schema.sql).
+   `schema.sql` is the single canonical schema — it now contains everything that
+   previously lived in `patch.sql`, `curriculum.sql`, `classes.sql`, and
+   `school-portal.sql` (those files were removed). All files are idempotent and
+   safe to re-run.
+3. Row Level Security is enabled on every table by `schema.sql` (no manual step).
 4. Under **Authentication → URL Configuration**, set:
    - Site URL: `https://app.codeshipacademy.com`
    - Redirect URLs: `https://app.codeshipacademy.com/**`

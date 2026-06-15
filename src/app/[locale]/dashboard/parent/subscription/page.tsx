@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { requireRole } from '@/lib/utils/auth'
 import Link from 'next/link'
+import SubscribeButton from '@/components/parent/SubscribeButton'
 
 export default async function SubscriptionPage({ params }: { params: { locale: string } }) {
   const supabase = await createClient()
@@ -12,33 +13,44 @@ export default async function SubscriptionPage({ params }: { params: { locale: s
     .eq('user_id', user.id)
     .single()
 
-  const isTrialing = profile?.subscription_status === 'trialing'
+  const isTrialing = profile?.subscription_status === 'trial'
   const isActive = profile?.subscription_status === 'active'
-  const isCanceled = profile?.subscription_status === 'canceled'
+  const isCanceled = profile?.subscription_status === 'cancelled'
   const trialDaysLeft = profile?.trial_ends_at
     ? Math.max(0, Math.ceil((new Date(profile.trial_ends_at).getTime() - Date.now()) / (86400 * 1000)))
     : 0
 
   const planNames: Record<string, string> = {
-    free: 'Free',
-    individual: 'Individual — $9.99/mo',
-    family: 'Family — $17.99/mo',
-    school: 'School',
+    trial: 'Free Trial',
+    monthly: 'Personal — $19/mo',
+    annual: 'Personal Annual — $149/yr',
+    family: 'Family — $29/mo',
+    teacher: 'Teacher — $49/mo',
+    school_monthly: 'School — $299/mo',
+    school_annual: 'School — $2,499/yr',
   }
 
   const PLANS = [
     {
-      key: 'individual',
-      name: 'Individual',
-      price: '$9.99',
+      key: 'monthly',
+      name: 'Personal Monthly',
+      price: '$19',
       period: '/month',
       features: ['1 child account', 'All curriculum levels', 'AI Tutor', 'Progress reports', 'Certificates'],
       highlighted: false,
     },
     {
+      key: 'annual',
+      name: 'Personal Annual',
+      price: '$149',
+      period: '/year',
+      features: ['1 child account', 'All curriculum levels', 'AI Tutor', 'Save vs monthly', 'Certificates'],
+      highlighted: false,
+    },
+    {
       key: 'family',
       name: 'Family',
-      price: '$17.99',
+      price: '$29',
       period: '/month',
       features: ['Up to 4 children', 'All curriculum levels', 'AI Tutor', 'Progress reports', 'Certificates', 'Priority support'],
       highlighted: true,
@@ -55,7 +67,7 @@ export default async function SubscriptionPage({ params }: { params: { locale: s
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xl font-bold text-brand-navy">
-              {planNames[profile?.subscription_plan || 'free'] || 'Free'}
+              {planNames[profile?.subscription_plan || 'trial'] || 'Free Trial'}
             </p>
             {isTrialing && (
               <p className="text-sm text-orange-600 mt-1">Free trial · {trialDaysLeft} days remaining</p>
@@ -74,12 +86,12 @@ export default async function SubscriptionPage({ params }: { params: { locale: s
       </div>
 
       {/* Upgrade options */}
-      {(!isActive || profile?.subscription_plan === 'free') && (
+      {!isActive && (
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             {isTrialing ? 'Choose a plan before your trial ends' : 'Upgrade your plan'}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {PLANS.map(plan => (
               <div key={plan.key} className={`card p-6 ${plan.highlighted ? 'border-2 border-brand-gold' : ''}`}>
                 {plan.highlighted && (
@@ -98,15 +110,7 @@ export default async function SubscriptionPage({ params }: { params: { locale: s
                     </li>
                   ))}
                 </ul>
-                <form action="/api/stripe/checkout" method="POST">
-                  <input type="hidden" name="plan" value={plan.key} />
-                  <button
-                    type="submit"
-                    className={`w-full py-2 rounded-lg font-semibold transition-colors ${plan.highlighted ? 'btn-primary' : 'btn-secondary'}`}
-                  >
-                    Subscribe to {plan.name}
-                  </button>
-                </form>
+                <SubscribeButton plan={plan.key} label={`Subscribe to ${plan.name}`} highlighted={plan.highlighted} />
               </div>
             ))}
           </div>

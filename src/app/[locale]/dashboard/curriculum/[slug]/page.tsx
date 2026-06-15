@@ -23,16 +23,35 @@ export default async function LessonPage({
   if (!lesson) notFound()
 
   const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
-  let studentId = user.id
+
+  // Resolve the active student profile id (children are profiles rows).
+  const { data: ownProfile } = await supabase
+    .from('profiles')
+    .select('id, level, date_of_birth')
+    .eq('user_id', user.id)
+    .single()
+
+  let studentId = ownProfile?.id ?? user.id
+  let student: { level: string | null; age: number | null } | null = ownProfile
+    ? {
+        level: ownProfile.level,
+        age: ownProfile.date_of_birth
+          ? Math.floor((Date.now() - new Date(ownProfile.date_of_birth).getTime()) / 31557600000)
+          : null,
+      }
+    : null
 
   if (userData?.role === 'parent') {
     const { data: firstChild } = await supabase
       .from('student_profiles')
-      .select('id')
+      .select('id, level, age')
       .eq('parent_id', user.id)
       .limit(1)
       .single()
-    studentId = firstChild?.id ?? user.id
+    if (firstChild) {
+      studentId = firstChild.id
+      student = { level: firstChild.level, age: firstChild.age }
+    }
   }
 
   const { data: progress } = await supabase
@@ -40,12 +59,6 @@ export default async function LessonPage({
     .select('*')
     .eq('student_id', studentId)
     .eq('lesson_id', lesson.id)
-    .single()
-
-  const { data: student } = await supabase
-    .from('student_profiles')
-    .select('level, age')
-    .eq('id', studentId)
     .single()
 
   return (

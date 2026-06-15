@@ -31,9 +31,14 @@ export async function POST(request: NextRequest) {
 
   // Verify ownership: user must be the student, or the parent of the student
   const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
+  const { data: callerProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
 
   let authorised = false
-  if (userData?.role === 'student' && user.id === studentId) authorised = true
+  if (userData?.role === 'student' && callerProfile?.id === studentId) authorised = true
   if (userData?.role === 'parent') {
     const { data: student } = await supabase
       .from('student_profiles')
