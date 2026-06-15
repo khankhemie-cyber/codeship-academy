@@ -193,18 +193,23 @@ CREATE TABLE IF NOT EXISTS public.lessons (
 );
 
 CREATE TABLE IF NOT EXISTS public.projects (
-  id            uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  slug          text UNIQUE NOT NULL,
-  title         text NOT NULL,
-  level         text,
-  category      text,
-  starter_code  text,
-  instructions  text,
-  tags          text[],
-  xp_reward     int NOT NULL DEFAULT 200,
-  is_visible    boolean NOT NULL DEFAULT true,
-  sort_order    int,
-  created_at    timestamptz NOT NULL DEFAULT now()
+  id                  uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  slug                text UNIQUE NOT NULL,
+  title               text NOT NULL,
+  level               text,
+  category            text,
+  difficulty          text,
+  duration_minutes    int,
+  starter_code        text,
+  description         text,
+  instructions        text,
+  tags                text[],
+  learning_objectives text[],
+  xp_reward           int NOT NULL DEFAULT 200,
+  is_visible          boolean NOT NULL DEFAULT true,
+  is_published        boolean NOT NULL DEFAULT true,
+  sort_order          int,
+  created_at          timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS public.quizzes (

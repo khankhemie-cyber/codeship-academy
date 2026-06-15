@@ -627,7 +627,7 @@ Build a page with: a fixed navbar, a sticky sidebar, and a card with an absolute
 
 Create a loading spinner, a pulsing button, and a slide-in hero section.'),
 
-('bld-l15', 'Responsive Design', 'CSS', 30, 100, 15, true,
+('bld-l15', 'Responsive Design', 'builders', 'CSS', 30, 100, 15, true,
 '# Responsive Design — Every Screen Size
 
 ## The Viewport Meta Tag
@@ -1458,7 +1458,7 @@ ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO lessons (slug, title, level, category, duration_minutes, xp_reward, sort_order, is_visible, instructions)
 SELECT
-  'bld-l' || LPAD(n::text, 2, '0'),
+  'bld-l' || LPAD(n::text, GREATEST(2, length(n::text)), '0'),
   title,
   'builders',
   category,

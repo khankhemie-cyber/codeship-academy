@@ -597,7 +597,7 @@ ON CONFLICT (slug) DO NOTHING;
 -- Insert remaining projects 13-100 with minimal content
 INSERT INTO projects (slug, title, level, category, starter_code, instructions, tags, xp_reward, sort_order)
 SELECT
-  'bld-p' || LPAD(n::text, 2, '0'),
+  'bld-p' || LPAD(n::text, GREATEST(2, length(n::text)), '0'),
   title,
   'builders',
   category,
