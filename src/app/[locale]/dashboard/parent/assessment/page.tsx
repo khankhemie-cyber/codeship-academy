@@ -15,7 +15,7 @@ interface AssessmentResult {
 const LEVEL_LABELS: Record<string, string> = {
   explorers: '🌱 Explorers (K–1)',
   builders: '🏗️ Builders (Gr 2–3)',
-  developers: '💻 Developers (Gr 4–6)',
+  developers: '💻 Developers (Gr 4–8)',
   engineers: '⚙️ Engineers (Gr 7–8)',
 }
 

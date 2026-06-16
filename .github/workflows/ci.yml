@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, "claude/**"]
+    branches: [main, "claude/**", "cursor/**"]
   pull_request:
     branches: [main]
 
@@ -41,6 +41,15 @@ jobs:
           ANTHROPIC_API_KEY: placeholder
           STRIPE_SECRET_KEY: sk_test_placeholder
           STRIPE_WEBHOOK_SECRET: whsec_placeholder
+          STRIPE_PRICE_MONTHLY: price_placeholder
+          STRIPE_PRICE_ANNUAL: price_placeholder
+          STRIPE_PRICE_FAMILY: price_placeholder
+          STRIPE_PRICE_TEACHER: price_placeholder
+          STRIPE_PRICE_SESSIONS_5: price_placeholder
+          STRIPE_PRICE_SESSIONS_10: price_placeholder
+          STRIPE_PRICE_SESSIONS_20: price_placeholder
+          STRIPE_PRICE_SCHOOL_MONTHLY: price_placeholder
+          STRIPE_PRICE_SCHOOL_ANNUAL: price_placeholder
           RESEND_API_KEY: re_placeholder
           EMAIL_FROM: noreply@codeshipacademy.com
           CRON_SECRET: placeholder

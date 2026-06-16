@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 
 export default function ResetPasswordPage() {
+  const locale = useLocale()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -17,7 +19,7 @@ export default function ResetPasswordPage() {
 
     const supabase = createClient()
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/en/reset-password/confirm`,
+      redirectTo: `${window.location.origin}/${locale}/reset-password/confirm`,
     })
 
     if (resetError) {
@@ -35,7 +37,7 @@ export default function ResetPasswordPage() {
           <div className="text-6xl mb-4">✅</div>
           <h1 className="text-xl font-bold mb-2">Reset link sent!</h1>
           <p className="text-gray-600 mb-6">Check your email for the password reset link.</p>
-          <Link href="/en/login" className="btn-secondary">Back to Login</Link>
+          <Link href={`/${locale}/login`} className="btn-secondary">Back to Login</Link>
         </div>
       </div>
     )
@@ -45,7 +47,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen bg-brand-light flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/en" className="font-extrabold text-2xl text-brand-navy">CODEship Academy</Link>
+          <Link href={`/${locale}`} className="font-extrabold text-2xl text-brand-navy">CODEship Academy</Link>
           <h1 className="text-xl font-bold mt-2">Reset your password</h1>
         </div>
         <div className="card">
@@ -70,7 +72,7 @@ export default function ResetPasswordPage() {
             </button>
           </form>
           <div className="mt-4 text-center text-sm">
-            <Link href="/en/login" className="text-brand-navy hover:underline">Back to login</Link>
+            <Link href={`/${locale}/login`} className="text-brand-navy hover:underline">Back to login</Link>
           </div>
         </div>
       </div>

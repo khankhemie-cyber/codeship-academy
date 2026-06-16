@@ -2,7 +2,9 @@ import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
-export default function VerifyEmailPage() {
+export default async function VerifyEmailPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+
   return (
     <div className="min-h-screen bg-brand-light flex items-center justify-center p-4">
       <div className="max-w-md w-full text-center">
@@ -17,7 +19,7 @@ export default function VerifyEmailPage() {
             admin@codeshipacademy.com
           </a>
         </p>
-        <Link href="/en/login" className="btn-secondary">
+        <Link href={`/${locale}/login`} className="btn-secondary">
           Back to Login
         </Link>
       </div>
