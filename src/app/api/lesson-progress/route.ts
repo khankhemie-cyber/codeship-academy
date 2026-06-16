@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 
 const ProgressSchema = z.object({
@@ -79,7 +79,8 @@ export async function POST(request: NextRequest) {
 
   // Award XP if completed
   if (status === 'completed') {
-    await supabase.rpc('award_xp', { p_student_id: studentId, p_base_xp: 100 })
+    const serviceSupabase = await createServiceClient()
+    await serviceSupabase.rpc('award_xp', { p_student_id: studentId, p_base_xp: 100 })
   }
 
   return NextResponse.json({ success: true })
