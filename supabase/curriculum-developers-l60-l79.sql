@@ -1167,3 +1167,1790 @@ When you write tests for your functions:
 - `setUp()` runs automatically before every test method, useful for preparing fresh test data.
 - Run tests from the command line with `python -m unittest test_filename.py`.')
 ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l68', 'Python Virtual Environments and pip', 'developers', 'Python', 'en', 'intermediate', 35, 150, 68, '## Python Virtual Environments and pip
+
+As you build bigger projects, you will want to use code other people have already written — called **packages** or **libraries** — instead of writing everything from scratch. Today you will learn how to install packages with **pip**, and why professional developers isolate each project using a **virtual environment**.
+
+### What Is pip?
+
+`pip` is Python''s package installer. It downloads packages from PyPI (the Python Package Index), a huge online library of free, reusable code, and installs them so you can `import` them in your programs.
+
+```
+pip install requests
+```
+
+After installing, you can use it in your code:
+
+```python
+import requests
+
+response = requests.get("https://api.agify.io?name=nova")
+print(response.json())
+```
+
+You have already used `requests` in an earlier lesson — now you know how it actually gets onto your computer!
+
+### Checking What Is Installed
+
+```
+pip list
+```
+
+This shows every package currently installed, along with its version number.
+
+```
+pip show requests
+```
+
+This shows details about one specific package — its version, location, and dependencies.
+
+### The Problem pip Alone Creates
+
+Imagine you are working on two different projects:
+
+- Project A needs `requests` version 2.25
+- Project B needs `requests` version 2.31
+
+If you only have *one* global Python installation, you cannot have two different versions of the same package installed at once — installing one for Project B would break Project A.
+
+### The Solution: Virtual Environments
+
+A **virtual environment** (often called a "venv") is an isolated, self-contained Python setup just for one project. Each project gets its own folder of installed packages, completely separate from every other project and from your computer''s main Python installation.
+
+### Creating a Virtual Environment
+
+```
+python -m venv myenv
+```
+
+This creates a new folder called `myenv` containing a fresh, isolated copy of Python and pip.
+
+### Activating a Virtual Environment
+
+You need to "activate" it before installing packages into it.
+
+On macOS/Linux:
+```
+source myenv/bin/activate
+```
+
+On Windows:
+```
+myenv\Scripts\activate
+```
+
+Once activated, your terminal prompt usually changes to show the environment name, like `(myenv) $`. Any package you install now goes *only* into this environment.
+
+```
+(myenv) $ pip install requests
+(myenv) $ pip install pandas
+```
+
+### Deactivating
+
+When you are done working on the project:
+
+```
+deactivate
+```
+
+This returns you to your computer''s normal Python setup.
+
+### Saving and Sharing Your Project''s Dependencies
+
+Professional projects keep a list of required packages in a file called `requirements.txt`, so anyone (including you, on a different computer) can recreate the exact same environment.
+
+Generate it from your active environment:
+
+```
+pip freeze > requirements.txt
+```
+
+This creates a file like:
+
+```
+requests==2.31.0
+pandas==2.1.0
+```
+
+Someone else can then install everything at once:
+
+```
+pip install -r requirements.txt
+```
+
+### A Typical Project Workflow
+
+```
+mkdir my_project
+cd my_project
+python -m venv venv
+source venv/bin/activate
+pip install requests
+pip freeze > requirements.txt
+```
+
+Now anyone who clones this project can run `pip install -r requirements.txt` inside their own virtual environment and have exactly the right packages, with no version conflicts.
+
+### Why This Matters
+
+- Every real-world Python project you will work on — at a job, in open source, or in college — uses virtual environments.
+- It keeps your projects from interfering with each other.
+- It makes your project reproducible: anyone, anywhere, can set it up identically.
+
+### Key Takeaways
+
+- `pip` is Python''s tool for installing packages from the internet (PyPI).
+- A virtual environment is an isolated Python setup for a single project, preventing version conflicts between projects.
+- Create one with `python -m venv venv_name`, then activate it before installing packages.
+- `pip freeze > requirements.txt` saves your project''s exact dependencies; `pip install -r requirements.txt` installs them elsewhere.
+- Using virtual environments is standard practice for every real Python project.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l69', 'Python Date and Time (datetime module)', 'developers', 'Python', 'en', 'intermediate', 35, 150, 69, '## Python Date and Time (the datetime module)
+
+Almost every real application needs to work with dates and times — birthdays, deadlines, timestamps on messages, countdown timers. Python''s built-in `datetime` module gives you powerful tools for all of this.
+
+### Getting the Current Date and Time
+
+```python
+from datetime import datetime
+
+now = datetime.now()
+print(now)              # 2026-06-17 14:32:07.123456
+print(now.year)         # 2026
+print(now.month)        # 6
+print(now.day)          # 17
+print(now.hour)         # 14
+print(now.minute)       # 32
+```
+
+### Creating a Specific Date or Time
+
+```python
+from datetime import datetime
+
+birthday = datetime(2013, 9, 21)
+print(birthday)              # 2013-09-21 00:00:00
+
+meeting = datetime(2026, 6, 20, 15, 30)   # year, month, day, hour, minute
+print(meeting)                # 2026-06-20 15:30:00
+```
+
+### The date Class (Just the Date, No Time)
+
+```python
+from datetime import date
+
+today = date.today()
+print(today)            # 2026-06-17
+
+specific_day = date(2025, 12, 25)
+print(specific_day)     # 2025-12-25
+print(specific_day.weekday())   # 0 = Monday, 6 = Sunday
+```
+
+### Formatting Dates as Readable Strings
+
+Use `strftime()` ("string format time") to turn a date/time object into a nicely formatted string:
+
+```python
+from datetime import datetime
+
+now = datetime.now()
+print(now.strftime("%Y-%m-%d"))           # 2026-06-17
+print(now.strftime("%B %d, %Y"))          # June 17, 2026
+print(now.strftime("%A, %I:%M %p"))       # Wednesday, 02:32 PM
+```
+
+Common format codes:
+
+| Code | Meaning | Example |
+|---|---|---|
+| `%Y` | 4-digit year | 2026 |
+| `%m` | 2-digit month | 06 |
+| `%d` | 2-digit day | 17 |
+| `%B` | full month name | June |
+| `%A` | full weekday name | Wednesday |
+| `%H` | hour (24-hour) | 14 |
+| `%I` | hour (12-hour) | 02 |
+| `%M` | minute | 32 |
+| `%p` | AM or PM | PM |
+
+### Parsing Strings Into Dates
+
+Use `strptime()` ("string parse time") to go the other way — turn a text string into a real `datetime` object:
+
+```python
+from datetime import datetime
+
+text = "2026-06-17"
+parsed = datetime.strptime(text, "%Y-%m-%d")
+print(parsed)            # 2026-06-17 00:00:00
+print(parsed.year)       # 2026
+
+text2 = "December 25, 2025"
+parsed2 = datetime.strptime(text2, "%B %d, %Y")
+print(parsed2)            # 2025-12-25 00:00:00
+```
+
+The format string must exactly match the layout of the text you are parsing.
+
+### Doing Math With Dates: timedelta
+
+A `timedelta` represents a length of time — useful for adding or subtracting from dates.
+
+```python
+from datetime import datetime, timedelta
+
+today = datetime.now()
+next_week = today + timedelta(days=7)
+print(next_week)
+
+ten_days_ago = today - timedelta(days=10)
+print(ten_days_ago)
+
+in_two_hours = today + timedelta(hours=2)
+print(in_two_hours)
+```
+
+### Finding the Difference Between Two Dates
+
+Subtracting one `datetime` from another gives you a `timedelta`:
+
+```python
+from datetime import datetime
+
+start = datetime(2026, 1, 1)
+end = datetime(2026, 6, 17)
+
+difference = end - start
+print(difference.days)    # 167 (number of days between them)
+```
+
+### A Practical Example: Days Until a Birthday
+
+```python
+from datetime import date
+
+def days_until_birthday(month, day):
+    today = date.today()
+    birthday_this_year = date(today.year, month, day)
+
+    if birthday_this_year < today:
+        birthday_this_year = date(today.year + 1, month, day)
+
+    return (birthday_this_year - today).days
+
+print(days_until_birthday(12, 25))   # number of days until Dec 25
+```
+
+### A Practical Example: Age Calculator
+
+```python
+from datetime import date
+
+def calculate_age(birth_year, birth_month, birth_day):
+    today = date.today()
+    age = today.year - birth_year
+    if (today.month, today.day) < (birth_month, birth_day):
+        age -= 1
+    return age
+
+print(calculate_age(2013, 9, 21))
+```
+
+### Key Takeaways
+
+- `datetime.now()` gives the current date and time; `date.today()` gives just today''s date.
+- `strftime()` converts a date/time object into a formatted string; `strptime()` parses a string back into a date/time object.
+- Format codes like `%Y`, `%m`, `%d`, `%B`, and `%A` control how dates are displayed or parsed.
+- `timedelta` represents a duration and can be added to or subtracted from dates.
+- Subtracting two dates gives you a `timedelta`, which has a `.days` attribute for counting days between them.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l70', 'Python Intro to SQLite Databases', 'developers', 'Python', 'en', 'intermediate', 35, 150, 70, '## Python Intro to SQLite Databases
+
+You have stored data in lists, dictionaries, and even CSV files. But what happens when your data gets large, needs to be searched quickly, or needs to stay safe even if your program crashes? That is where **databases** come in. Today you will use **SQLite**, a lightweight database built right into Python, with no extra installation required.
+
+### What Is a Database?
+
+A database is an organized system for storing, searching, and updating data, usually arranged into **tables** — similar to spreadsheets, with rows and columns. SQLite stores an entire database in a single file on your computer, which makes it perfect for learning and for smaller projects.
+
+### Connecting to a Database
+
+```python
+import sqlite3
+
+connection = sqlite3.connect("school.db")   # creates the file if it doesn''t exist
+cursor = connection.cursor()
+```
+
+The **connection** represents the link to the database file. The **cursor** is what you use to actually run commands.
+
+### Creating a Table
+
+Tables are defined using SQL (Structured Query Language) — a language designed specifically for working with databases.
+
+```python
+cursor.execute(\'\'\'
+    CREATE TABLE IF NOT EXISTS students (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        age INTEGER,
+        grade INTEGER
+    )
+\'\'\')
+connection.commit()
+```
+
+- `PRIMARY KEY AUTOINCREMENT` means SQLite automatically assigns a unique, increasing `id` to every row.
+- `TEXT`, `INTEGER` are SQLite''s data types.
+- `connection.commit()` saves the changes permanently to the file.
+
+### Inserting Data
+
+```python
+cursor.execute(
+    "INSERT INTO students (name, age, grade) VALUES (?, ?, ?)",
+    ("Amir", 13, 8)
+)
+connection.commit()
+```
+
+Always use `?` placeholders instead of putting values directly into the SQL string — this protects against bugs and a serious security risk called "SQL injection."
+
+Inserting several rows at once:
+
+```python
+students = [
+    ("Lina", 12, 7),
+    ("Theo", 14, 8),
+    ("Sam", 13, 8),
+]
+cursor.executemany(
+    "INSERT INTO students (name, age, grade) VALUES (?, ?, ?)",
+    students
+)
+connection.commit()
+```
+
+### Querying Data
+
+```python
+cursor.execute("SELECT * FROM students")
+rows = cursor.fetchall()
+for row in rows:
+    print(row)
+# (1, ''Amir'', 13, 8)
+# (2, ''Lina'', 12, 7)
+# (3, ''Theo'', 14, 8)
+# (4, ''Sam'', 13, 8)
+```
+
+`fetchall()` returns every matching row as a list of tuples. `fetchone()` returns just the next single row.
+
+### Filtering With WHERE
+
+```python
+cursor.execute("SELECT * FROM students WHERE grade = ?", (8,))
+grade_8_students = cursor.fetchall()
+print(grade_8_students)
+```
+
+### Updating Data
+
+```python
+cursor.execute(
+    "UPDATE students SET age = ? WHERE name = ?",
+    (14, "Amir")
+)
+connection.commit()
+```
+
+### Deleting Data
+
+```python
+cursor.execute("DELETE FROM students WHERE name = ?", ("Sam",))
+connection.commit()
+```
+
+### Closing the Connection
+
+When you are done, always close the connection to make sure everything is saved properly:
+
+```python
+connection.close()
+```
+
+### A Practical Example: Putting It All Together
+
+```python
+import sqlite3
+
+connection = sqlite3.connect("school.db")
+cursor = connection.cursor()
+
+cursor.execute(\'\'\'
+    CREATE TABLE IF NOT EXISTS students (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        age INTEGER,
+        grade INTEGER
+    )
+\'\'\')
+
+cursor.execute("INSERT INTO students (name, age, grade) VALUES (?, ?, ?)", ("Nova", 13, 8))
+connection.commit()
+
+cursor.execute("SELECT name, age FROM students WHERE grade = ?", (8,))
+for name, age in cursor.fetchall():
+    print(f"{name} is {age} years old")
+
+connection.close()
+```
+
+### Why SQLite Matters
+
+Real applications — including most mobile apps — use SQLite to store data locally. Learning it now gives you the foundation you will need later in this course when you explore full SQL and bigger databases.
+
+### Key Takeaways
+
+- A database organizes data into tables made of rows and columns, and SQLite stores an entire database as a single file.
+- `sqlite3.connect()` opens (or creates) a database file; `cursor.execute()` runs SQL commands.
+- Use `?` placeholders with a tuple of values when inserting or filtering data — never insert values directly into the SQL string.
+- `fetchall()` retrieves every matching row; `fetchone()` retrieves just one.
+- Always call `connection.commit()` after changes and `connection.close()` when finished.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l71', 'Python Mini-Project: Address Book App', 'developers', 'Python', 'en', 'intermediate', 35, 150, 71, '## Python Mini-Project: Address Book App
+
+It is time to combine many of the skills you have built over the last several lessons — functions, dictionaries, file handling, JSON, and even SQLite — into one complete, useful program: a command-line **Address Book** app.
+
+### Planning the Project
+
+Before writing code, let''s plan what our address book needs to do:
+
+1. Add a new contact (name, phone, email)
+2. View all contacts
+3. Search for a contact by name
+4. Delete a contact
+5. Save contacts so they are still there next time the program runs
+
+We will start with a simple in-memory + JSON file version, which reinforces file I/O and JSON skills from earlier lessons.
+
+### Step 1: Data Structure
+
+We will store each contact as a dictionary, and all contacts in a list:
+
+```python
+contacts = [
+    {"name": "Amir", "phone": "555-1234", "email": "amir@email.com"},
+    {"name": "Lina", "phone": "555-5678", "email": "lina@email.com"},
+]
+```
+
+### Step 2: Loading and Saving With JSON
+
+```python
+import json
+import os
+
+FILENAME = "contacts.json"
+
+def load_contacts():
+    if not os.path.exists(FILENAME):
+        return []
+    with open(FILENAME, "r") as f:
+        return json.load(f)
+
+def save_contacts(contacts):
+    with open(FILENAME, "w") as f:
+        json.dump(contacts, f, indent=2)
+```
+
+### Step 3: Adding a Contact
+
+```python
+def add_contact(contacts):
+    name = input("Name: ")
+    phone = input("Phone: ")
+    email = input("Email: ")
+    contacts.append({"name": name, "phone": phone, "email": email})
+    save_contacts(contacts)
+    print(f"Added {name} to your address book.")
+```
+
+### Step 4: Viewing All Contacts
+
+```python
+def view_contacts(contacts):
+    if not contacts:
+        print("Your address book is empty.")
+        return
+    for i, contact in enumerate(contacts, start=1):
+        print(f"{i}. {contact[''name'']} — {contact[''phone'']} — {contact[''email'']}")
+```
+
+### Step 5: Searching for a Contact
+
+```python
+def search_contact(contacts):
+    query = input("Search by name: ").lower()
+    results = [c for c in contacts if query in c["name"].lower()]
+    if results:
+        for contact in results:
+            print(f"{contact[''name'']} — {contact[''phone'']} — {contact[''email'']}")
+    else:
+        print("No matching contacts found.")
+```
+
+### Step 6: Deleting a Contact
+
+```python
+def delete_contact(contacts):
+    name = input("Name to delete: ").lower()
+    matching = [c for c in contacts if c["name"].lower() == name]
+    if not matching:
+        print("No contact found with that name.")
+        return
+    contacts.remove(matching[0])
+    save_contacts(contacts)
+    print(f"Deleted {matching[0][''name'']}.")
+```
+
+### Step 7: The Main Menu Loop
+
+```python
+def main():
+    contacts = load_contacts()
+
+    while True:
+        print("\\n--- Address Book ---")
+        print("1. Add contact")
+        print("2. View all contacts")
+        print("3. Search contacts")
+        print("4. Delete a contact")
+        print("5. Quit")
+
+        choice = input("Choose an option: ")
+
+        if choice == "1":
+            add_contact(contacts)
+        elif choice == "2":
+            view_contacts(contacts)
+        elif choice == "3":
+            search_contact(contacts)
+        elif choice == "4":
+            delete_contact(contacts)
+        elif choice == "5":
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid option, please try again.")
+
+if __name__ == "__main__":
+    main()
+```
+
+### Putting the Whole Program Together
+
+Combine every function above (`load_contacts`, `save_contacts`, `add_contact`, `view_contacts`, `search_contact`, `delete_contact`, and `main`) into a single file called `address_book.py`, with `main()` called at the bottom using the `if __name__ == "__main__":` guard. Running it gives you a fully working, menu-driven app that remembers your contacts between runs because everything is saved to `contacts.json`.
+
+### Ideas to Extend This Project
+
+Once your basic version works, try adding:
+
+- **Editing** an existing contact''s phone or email
+- **Sorting** contacts alphabetically before displaying them
+- **Validation** so empty names or badly formatted phone numbers are rejected
+- Switching from a JSON file to a **SQLite database** (using what you learned last lesson) so the app can handle thousands of contacts efficiently
+
+### Why This Project Matters
+
+This is your first project that brings together input/output, persistent storage, functions, and a menu-driven loop — the same basic shape used by countless real command-line tools. Being comfortable building something like this from scratch is a major milestone.
+
+### Key Takeaways
+
+- Breaking a big project into small functions (`add_contact`, `view_contacts`, `search_contact`, `delete_contact`) makes it far easier to build and debug.
+- Saving data to a JSON file after every change means your program''s data survives between runs.
+- A `while True` loop with a menu of numbered choices is a common, simple way to structure an interactive command-line program.
+- List comprehensions (from earlier lessons) make searching and filtering contacts concise and readable.
+- This project pattern — menu loop + persistent storage + CRUD operations (Create, Read, Update, Delete) — appears throughout real-world software.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l72', 'Python Algorithms: Linear and Binary Search', 'developers', 'Python', 'en', 'intermediate', 35, 150, 72, '## Python Algorithms: Linear and Binary Search
+
+You have been searching through lists for many lessons now, usually with `in` or a loop. Today you will look "under the hood" at two specific **search algorithms** — step-by-step methods for finding something — and learn why one can be dramatically faster than the other.
+
+### What Is an Algorithm?
+
+An algorithm is simply a precise set of steps for solving a problem. You already write algorithms every time you write a function! Today''s lesson focuses on comparing two different algorithms that solve the *same* problem (finding a value in a list) in different ways.
+
+### Linear Search
+
+Linear search checks every item, one at a time, from the beginning, until it finds a match (or reaches the end).
+
+```python
+def linear_search(items, target):
+    for index, value in enumerate(items):
+        if value == target:
+            return index
+    return -1   # not found
+
+numbers = [4, 8, 15, 16, 23, 42]
+print(linear_search(numbers, 23))   # 4
+print(linear_search(numbers, 99))   # -1
+```
+
+Linear search works on **any** list, sorted or not. But in the worst case (the item is last, or missing entirely), it has to check every single item.
+
+### Binary Search
+
+Binary search is much faster, but only works on a **sorted** list. Instead of checking every item, it repeatedly looks at the *middle* item and eliminates half of the remaining list each time.
+
+The idea: "Pick a number between 1 and 100" guessing games work this way — guess 50, get told higher or lower, then guess 75 or 25, and so on. You narrow the possibilities in half every guess.
+
+```python
+def binary_search(items, target):
+    low = 0
+    high = len(items) - 1
+
+    while low <= high:
+        mid = (low + high) // 2
+        if items[mid] == target:
+            return mid
+        elif items[mid] < target:
+            low = mid + 1     # target must be in the right half
+        else:
+            high = mid - 1    # target must be in the left half
+
+    return -1   # not found
+
+numbers = [4, 8, 15, 16, 23, 42, 50, 71, 89]
+print(binary_search(numbers, 42))   # 5
+print(binary_search(numbers, 100))  # -1
+```
+
+### Tracing Through Binary Search
+
+Let''s search for `23` in `[4, 8, 15, 16, 23, 42, 50, 71, 89]` (indexes 0-8):
+
+```
+low = 0, high = 8, mid = 4 -> items[4] = 23 -> FOUND at index 4!
+```
+
+That only took one step! Now let''s search for `71`:
+
+```
+low = 0, high = 8, mid = 4 -> items[4] = 23, target (71) is bigger -> search right half
+low = 5, high = 8, mid = 6 -> items[6] = 50, target (71) is bigger -> search right half
+low = 7, high = 8, mid = 7 -> items[7] = 71 -> FOUND at index 7!
+```
+
+Three steps, in a list of 9 items. Linear search would have taken up to 8 steps in the worst case.
+
+### Why Binary Search Is So Much Faster
+
+Every step of binary search cuts the remaining possibilities in half. For a list of 1,000 items:
+
+- Linear search: up to 1,000 checks
+- Binary search: only about 10 checks! (because 2^10 = 1024)
+
+For a list of 1,000,000 items:
+
+- Linear search: up to 1,000,000 checks
+- Binary search: only about 20 checks! (because 2^20 ≈ 1,000,000)
+
+This kind of efficiency difference is exactly why computer scientists study algorithms — the right algorithm can turn an impossibly slow program into an instant one.
+
+### The Catch: Binary Search Needs Sorted Data
+
+```python
+numbers = [42, 8, 23, 4, 16]   # NOT sorted
+print(binary_search(numbers, 23))   # may give the WRONG answer!
+```
+
+If the list is not sorted, binary search''s "eliminate half" logic breaks down completely. You must sort the list first (we will cover sorting algorithms in the next lesson), which has its own cost — but if you are going to search the *same* list many times, sorting once and using binary search repeatedly is well worth it.
+
+### Comparing the Two
+
+| | Linear Search | Binary Search |
+|---|---|---|
+| Requires sorted data? | No | Yes |
+| Worst case for 1,000 items | 1,000 checks | ~10 checks |
+| Works on any list | Yes | Only sorted |
+| Code complexity | Very simple | Slightly more complex |
+
+### Key Takeaways
+
+- Linear search checks every item one by one and works on any list, sorted or not.
+- Binary search repeatedly checks the middle item and eliminates half the remaining list each step — but it only works on sorted data.
+- Binary search is dramatically faster for large lists: roughly 20 steps for a million items, versus up to a million steps for linear search.
+- Choosing the right algorithm for the situation can make the difference between a program that is instant and one that is painfully slow.
+- This idea — measuring how an algorithm''s speed grows with input size — is the foundation of a topic called "Big O notation," which you will explore more in future lessons.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l73', 'Python Algorithms: Sorting (Bubble, Selection, Intro to Quicksort)', 'developers', 'Python', 'en', 'intermediate', 35, 150, 73, '## Python Algorithms: Sorting
+
+Last lesson, binary search needed a sorted list to work its magic. But how does a list actually *get* sorted? Today you will write three classic **sorting algorithms** from scratch: bubble sort, selection sort, and a first look at quicksort.
+
+### Bubble Sort
+
+Bubble sort repeatedly steps through the list, comparing neighboring pairs and swapping them if they are in the wrong order. Larger values "bubble" toward the end with each pass.
+
+```python
+def bubble_sort(items):
+    items = items.copy()
+    n = len(items)
+
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if items[j] > items[j + 1]:
+                items[j], items[j + 1] = items[j + 1], items[j]
+
+    return items
+
+numbers = [5, 2, 9, 1, 5, 6]
+print(bubble_sort(numbers))   # [1, 2, 5, 5, 6, 9]
+```
+
+Why `n - i - 1`? After each full pass, the largest remaining value has already "bubbled" to its correct spot at the end, so we don''t need to check it again.
+
+Bubble sort is simple to understand but slow for large lists — it is mainly taught because it is the clearest introduction to how sorting algorithms think.
+
+### Selection Sort
+
+Selection sort repeatedly finds the smallest remaining value and moves it to the front.
+
+```python
+def selection_sort(items):
+    items = items.copy()
+    n = len(items)
+
+    for i in range(n):
+        min_index = i
+        for j in range(i + 1, n):
+            if items[j] < items[min_index]:
+                min_index = j
+        items[i], items[min_index] = items[min_index], items[i]
+
+    return items
+
+numbers = [5, 2, 9, 1, 5, 6]
+print(selection_sort(numbers))   # [1, 2, 5, 5, 6, 9]
+```
+
+Trace through it: on the first pass, it scans the whole list and finds `1` is the smallest, swapping it to the front. On the second pass, it scans everything *except* the first item and finds the next smallest, and so on.
+
+### Comparing Bubble Sort and Selection Sort
+
+Both algorithms are similar in speed (roughly checking every pair of items), but selection sort does fewer total swaps, since it only swaps once per pass instead of repeatedly during the pass.
+
+### Quicksort: A Faster Approach
+
+Quicksort uses a smarter strategy: pick a "pivot" value, then split the rest of the list into "smaller than pivot" and "larger than pivot" groups, and recursively sort each group.
+
+```python
+def quicksort(items):
+    if len(items) <= 1:
+        return items   # base case: 0 or 1 items are already sorted
+
+    pivot = items[len(items) // 2]
+    smaller = [x for x in items if x < pivot]
+    equal = [x for x in items if x == pivot]
+    larger = [x for x in items if x > pivot]
+
+    return quicksort(smaller) + equal + quicksort(larger)
+
+numbers = [5, 2, 9, 1, 5, 6]
+print(quicksort(numbers))   # [1, 2, 5, 5, 6, 9]
+```
+
+Notice this uses **recursion** (from our earlier lesson) — quicksort calls itself on smaller and smaller sublists until it hits the base case of a list with 0 or 1 items.
+
+### Tracing Quicksort
+
+```
+quicksort([5, 2, 9, 1, 5, 6])
+pivot = 1 (the middle item, index 3)
+smaller = [] (nothing is less than 1... wait, let''s use the actual middle)
+```
+
+Let''s trace more carefully — the middle index of `[5, 2, 9, 1, 5, 6]` (length 6) is index 3, so `pivot = 1`:
+
+```
+smaller = []          (nothing less than 1)
+equal   = [1]
+larger  = [5, 2, 9, 5, 6]
+
+quicksort(larger) splits again with a new pivot from THAT list, and so on,
+until everything is broken down into pieces of size 0 or 1.
+```
+
+Each recursive call works on a smaller list, and the results get combined back together with `+`.
+
+### Why Quicksort Is Usually Faster
+
+Bubble sort and selection sort both compare almost every pair of items, taking roughly `n * n` total comparisons for a list of `n` items. Quicksort, by splitting the list in a smart way, typically only needs roughly `n * log(n)` comparisons — a huge improvement for large lists, similar in spirit to why binary search beat linear search last lesson.
+
+| | Bubble Sort | Selection Sort | Quicksort |
+|---|---|---|---|
+| Typical speed | Slow | Slow | Fast |
+| Easy to understand | Very easy | Easy | Moderate |
+| Uses recursion | No | No | Yes |
+| Used in real-world libraries | Rarely | Rarely | Often (in optimized forms) |
+
+### Python''s Built-In Sorting
+
+In real projects, you would almost never write your own sorting algorithm — Python''s built-in `sorted()` and `.sort()` are highly optimized (using an algorithm called Timsort) and should always be your first choice:
+
+```python
+numbers = [5, 2, 9, 1, 5, 6]
+print(sorted(numbers))   # [1, 2, 5, 5, 6, 9]
+```
+
+We write our own versions in this lesson so you understand *how* sorting works underneath — this understanding is valuable for technical interviews and for building intuition about algorithm performance.
+
+### Key Takeaways
+
+- Bubble sort repeatedly swaps neighboring out-of-order pairs, "bubbling" the largest values to the end.
+- Selection sort repeatedly finds the smallest remaining value and moves it into place.
+- Quicksort recursively splits the list around a pivot value into smaller and larger groups, which is typically much faster for large lists.
+- In real projects, use Python''s built-in `sorted()`/`.sort()` rather than hand-written sorting algorithms.
+- Understanding how these algorithms work builds intuition about *why* some code runs fast and other code runs slow.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l74', 'Python Milestone Review and Practice', 'developers', 'Python', 'en', 'intermediate', 35, 150, 74, '## Python Milestone Review and Practice
+
+You have covered an enormous amount of ground over the last fourteen lessons — recursion, lambdas, decorators, generators, regular expressions, JSON and APIs, CSV files, unit testing, virtual environments, dates and times, SQLite, a full mini-project, and two lessons on algorithms. This lesson is a milestone checkpoint: a chance to review the big ideas and practice combining them before we shift toward command-line tools, web requests, and databases.
+
+### Quick Reference: What You Have Learned
+
+**Recursion** — a function calling itself with a smaller version of a problem, always needing a base case:
+
+```python
+def factorial(n):
+    if n == 0:
+        return 1
+    return n * factorial(n - 1)
+```
+
+**Lambda, map, filter** — short, throwaway functions and tools for transforming/filtering data:
+
+```python
+nums = [1, 2, 3, 4, 5, 6]
+evens_squared = list(map(lambda x: x ** 2, filter(lambda x: x % 2 == 0, nums)))
+```
+
+**Decorators** — functions that wrap other functions to add behavior:
+
+```python
+def shout(func):
+    def wrapper(text):
+        return func(text).upper() + "!"
+    return wrapper
+
+@shout
+def greet(name):
+    return f"hello, {name}"
+```
+
+**Generators** — functions that `yield` values one at a time instead of building a whole list:
+
+```python
+def countdown(n):
+    while n > 0:
+        yield n
+        n -= 1
+```
+
+**Regular expressions** — pattern matching in text using the `re` module:
+
+```python
+import re
+prices = re.findall(r"\d+", "Apples: 3, Oranges: 5")
+```
+
+**JSON and APIs** — converting data with `json.dumps()`/`json.loads()`, and fetching live data with `requests.get()`.
+
+**CSV files** — reading/writing spreadsheet-like data with `csv.DictReader`/`csv.DictWriter`.
+
+**Unit testing** — automatically checking code correctness with `unittest.TestCase` and assertion methods.
+
+**Virtual environments and pip** — isolating each project''s installed packages with `python -m venv` and `pip install`.
+
+**datetime** — working with dates, times, formatting (`strftime`), parsing (`strptime`), and durations (`timedelta`).
+
+**SQLite** — a lightweight, file-based database accessed through `sqlite3`, using SQL commands like `CREATE TABLE`, `INSERT`, `SELECT`, `UPDATE`, `DELETE`.
+
+**Search and sort algorithms** — linear vs. binary search, and bubble/selection/quicksort, plus why algorithm choice affects performance.
+
+### Practice Challenge 1: Recursive Word Counter
+
+Write a recursive function that counts how many words are in a nested list of strings (similar to the nested-list counting example from the recursion lesson):
+
+```python
+def count_words(data):
+    total = 0
+    for item in data:
+        if isinstance(item, list):
+            total += count_words(item)
+        else:
+            total += len(item.split())
+    return total
+
+sentences = ["hello world", ["how are you", "I am fine"], "goodbye"]
+print(count_words(sentences))   # 2 + (3 + 3) + 1 = 9
+```
+
+### Practice Challenge 2: Filter and Transform API-Style Data
+
+Combine `map()`/`filter()` (or a list comprehension) with dictionary data, similar to what you might get back from a real API:
+
+```python
+students = [
+    {"name": "Amir", "grade": 8, "score": 92},
+    {"name": "Lina", "grade": 7, "score": 78},
+    {"name": "Theo", "grade": 8, "score": 99},
+]
+
+honor_roll = [s["name"] for s in students if s["score"] >= 90]
+print(honor_roll)   # ["Amir", "Theo"]
+```
+
+### Practice Challenge 3: A Tiny Test Suite
+
+Write a function and a matching `unittest` test, just like in the unit testing lesson:
+
+```python
+def is_palindrome(text):
+    cleaned = text.lower().replace(" ", "")
+    return cleaned == cleaned[::-1]
+
+import unittest
+
+class TestPalindrome(unittest.TestCase):
+    def test_simple_palindrome(self):
+        self.assertTrue(is_palindrome("racecar"))
+
+    def test_phrase_palindrome(self):
+        self.assertTrue(is_palindrome("nurses run"))
+
+    def test_not_palindrome(self):
+        self.assertFalse(is_palindrome("hello"))
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+### Practice Challenge 4: Search and Sort Together
+
+```python
+def binary_search(items, target):
+    low, high = 0, len(items) - 1
+    while low <= high:
+        mid = (low + high) // 2
+        if items[mid] == target:
+            return mid
+        elif items[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
+
+unsorted_scores = [88, 45, 67, 92, 71, 53]
+sorted_scores = sorted(unsorted_scores)
+print(sorted_scores)
+print(binary_search(sorted_scores, 71))
+```
+
+### Self-Check Questions
+
+Before moving on, make sure you can confidently answer:
+
+1. What two things does every recursive function need?
+2. What is the difference between `map()`/`filter()` and a list comprehension?
+3. What does the `@` symbol do above a function definition?
+4. Why are generators more memory-efficient than building a full list?
+5. What is the difference between `json.dumps()` and `json.dump()`?
+6. Why should you always use a virtual environment for a new project?
+7. Why does binary search require sorted data, but linear search does not?
+
+### What''s Next
+
+You now have a strong foundation in core and intermediate Python. Starting next lesson, we begin shifting toward the tools professional developers use every day outside of just the Python language itself: the command line, Git branching, HTTP and APIs in more depth, building your own web API with Flask, and finally, real SQL databases. Everything you have learned so far — functions, data structures, files, testing — will be the foundation for all of it.
+
+### Key Takeaways
+
+- Recursion, lambdas/map/filter, decorators, and generators are all different tools for writing flexible, reusable functions.
+- JSON, CSV, and SQLite are three common ways real applications store and exchange data.
+- Unit testing and virtual environments are professional habits that make your code reliable and reproducible.
+- Search and sort algorithms show that *how* you solve a problem can matter as much as *whether* you solve it.
+- You are now ready to move from "Python the language" toward "Python in the real world" — command lines, APIs, web servers, and databases.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l75', 'Intro to the Command Line for Developers', 'developers', 'Command Line', 'en', 'intermediate', 35, 150, 75, '## Intro to the Command Line for Developers
+
+So far, you have mostly run your Python programs through an editor''s "Run" button. Professional developers spend much of their time in the **command line** (also called the terminal or shell) — a text-based way of controlling your computer. Today you will learn the essential commands every developer needs.
+
+### What Is the Command Line?
+
+The command line is a program that lets you type text commands instead of clicking icons. It might look intimidating at first — just a blinking cursor on a black or white screen — but it is one of the most powerful tools you will use as a developer. It lets you run programs, manage files, install software, and use tools like Git, all from text commands.
+
+### Navigating the File System
+
+| Command | Meaning |
+|---|---|
+| `pwd` | "print working directory" — shows where you currently are |
+| `ls` | "list" — shows the files/folders in the current directory |
+| `cd foldername` | "change directory" — moves into a folder |
+| `cd ..` | moves up one folder (to the parent) |
+| `cd ~` | moves to your home directory |
+
+```
+$ pwd
+/home/student/projects
+
+$ ls
+address_book.py   contacts.json   notes.txt
+
+$ cd address_book_project
+$ pwd
+/home/student/projects/address_book_project
+
+$ cd ..
+$ pwd
+/home/student/projects
+```
+
+### Working With Files and Folders
+
+| Command | Meaning |
+|---|---|
+| `mkdir name` | "make directory" — creates a new folder |
+| `touch file.txt` | creates a new, empty file |
+| `rm file.txt` | "remove" — deletes a file (careful, this is permanent!) |
+| `rm -r foldername` | deletes a folder and everything inside it |
+| `cp source dest` | "copy" — copies a file |
+| `mv source dest` | "move" — moves or renames a file |
+
+```
+$ mkdir my_new_project
+$ cd my_new_project
+$ touch main.py
+$ ls
+main.py
+
+$ cp main.py backup.py
+$ ls
+main.py   backup.py
+
+$ mv backup.py old_main.py
+$ ls
+main.py   old_main.py
+```
+
+### Viewing File Contents
+
+| Command | Meaning |
+|---|---|
+| `cat file.txt` | prints the entire file to the screen |
+| `head file.txt` | shows the first 10 lines |
+| `tail file.txt` | shows the last 10 lines |
+
+```
+$ cat notes.txt
+Remember to study for the algorithms quiz!
+```
+
+### Running Python Programs From the Command Line
+
+You have probably been doing this already without thinking of it as "the command line":
+
+```
+$ python address_book.py
+```
+
+or, depending on your system:
+
+```
+$ python3 address_book.py
+```
+
+### Useful Extras
+
+```
+$ clear           # clears the terminal screen
+$ history         # shows recently run commands
+$ echo "hello"    # prints text to the screen
+```
+
+### Combining Commands
+
+You can chain simple commands together. For example, create a folder, move into it, and create a file, all in one line using `&&` (which means "and then, only if the previous command succeeded"):
+
+```
+$ mkdir new_project && cd new_project && touch app.py
+```
+
+### A Practical Example: Setting Up a New Project
+
+```
+$ mkdir weather_app
+$ cd weather_app
+$ python -m venv venv
+$ source venv/bin/activate
+$ pip install requests
+$ touch weather.py
+$ ls
+venv   weather.py
+```
+
+This single sequence — using commands from this lesson plus the virtual environment lesson — is exactly how a real developer starts a brand-new project.
+
+### Why the Command Line Matters
+
+- It is often faster than clicking through folders and menus.
+- Many essential developer tools (Git, pip, deployment tools) are command-line only, or work best that way.
+- It lets you automate repetitive tasks.
+- It is the same basic toolkit whether you are on a laptop or working on a powerful remote server.
+
+### Key Takeaways
+
+- The command line lets you navigate, create, and manage files using typed commands instead of clicking.
+- `pwd`, `ls`, and `cd` are the core navigation commands.
+- `mkdir`, `touch`, `rm`, `cp`, and `mv` manage files and folders.
+- `cat`, `head`, and `tail` let you view file contents without opening an editor.
+- The `&&` operator chains commands together, running the next one only if the previous one succeeded.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l76', 'Git Branching and Merging', 'developers', 'Command Line', 'en', 'intermediate', 35, 150, 76, '## Git Branching and Merging
+
+You have used Git before to track changes and save versions of your projects. Today you will learn one of Git''s most powerful features: **branching** — the ability to work on new ideas or features in an isolated copy of your project, without disturbing the main, working version.
+
+### What Is a Branch?
+
+Think of your project''s history as a timeline. A **branch** is a separate timeline that starts from a specific point and can grow independently. The default branch is usually called `main` (sometimes `master`). When you create a new branch, you get a safe space to experiment — if something goes wrong, `main` is untouched.
+
+### Why Branch Instead of Just Editing main?
+
+Imagine you are adding a brand-new feature to your address book app, like sorting contacts alphabetically. If you edit `main` directly and something breaks halfway through, your whole project is broken. If you do the work on a separate branch instead, `main` stays safe and working the entire time.
+
+### Checking Your Current Branch
+
+```
+$ git branch
+* main
+```
+
+The `*` shows which branch you are currently on.
+
+### Creating a New Branch
+
+```
+$ git branch add-sorting-feature
+$ git branch
+  add-sorting-feature
+* main
+```
+
+This creates the branch, but you are still on `main` (notice the `*` is still next to `main`).
+
+### Switching Branches
+
+```
+$ git checkout add-sorting-feature
+Switched to branch ''add-sorting-feature''
+
+$ git branch
+* add-sorting-feature
+  main
+```
+
+A shortcut combines both steps — create *and* switch to a new branch in one command:
+
+```
+$ git checkout -b add-sorting-feature
+```
+
+(In newer versions of Git, `git switch -c add-sorting-feature` does the same thing.)
+
+### Making Changes on Your Branch
+
+Once on your new branch, work exactly like normal — edit files, then `add` and `commit`:
+
+```
+$ git add address_book.py
+$ git commit -m "Add alphabetical sorting to contact list"
+```
+
+This commit only exists on `add-sorting-feature`. If you switch back to `main`, your code there will look exactly like it did before you started.
+
+```
+$ git checkout main
+```
+
+Your sorting feature is not there — it is safely tucked away on the other branch, waiting for you.
+
+### Merging: Bringing Your Branch''s Work Into main
+
+Once your feature works and you are happy with it, you **merge** it back into `main`:
+
+```
+$ git checkout main
+$ git merge add-sorting-feature
+```
+
+This brings all the commits from `add-sorting-feature` into `main`. Now `main` has the sorting feature too.
+
+### Deleting a Branch After Merging
+
+Once a branch has been merged and you no longer need it, it is good practice to delete it to keep things tidy:
+
+```
+$ git branch -d add-sorting-feature
+```
+
+### Merge Conflicts
+
+Sometimes Git cannot automatically combine two branches — for example, if both branches changed the *same line* of the *same file* in different ways. This is called a **merge conflict**, and Git will mark it directly in the file:
+
+```python
+<<<<<<< HEAD
+def greet(name):
+    return f"Hello, {name}!"
+=======
+def greet(name):
+    return f"Hi there, {name}!"
+>>>>>>> add-sorting-feature
+```
+
+To resolve it, you manually edit the file to keep the version you want (or a combination), remove the `<<<<<<<`, `=======`, and `>>>>>>>` markers, then add and commit the result:
+
+```
+$ git add address_book.py
+$ git commit -m "Resolve merge conflict in greet function"
+```
+
+### A Typical Branching Workflow
+
+```
+$ git checkout -b add-search-feature
+# ...edit files, test your changes...
+$ git add .
+$ git commit -m "Add contact search feature"
+$ git checkout main
+$ git merge add-search-feature
+$ git branch -d add-search-feature
+```
+
+This pattern — branch, work, commit, merge, delete — is used by professional developers on every single feature, bug fix, or experiment, often dozens of times a day on large teams.
+
+### Why This Matters for Teams
+
+When multiple people work on the same project, branches let everyone work on different features at the same time without stepping on each other''s changes. Each person merges their finished work into `main` when it is ready, often after their teammates review it (you will see this idea again if you ever submit a "pull request" on GitHub).
+
+### Key Takeaways
+
+- A branch is an independent timeline of commits, letting you work on new features without affecting `main`.
+- `git checkout -b branch-name` creates and switches to a new branch in one step.
+- `git merge branch-name` (run while on the branch you want to merge *into*, usually `main`) combines another branch''s history into the current one.
+- A merge conflict happens when Git cannot automatically combine changes — you resolve it by manually editing the file and removing the conflict markers.
+- Branching and merging are the foundation of how real development teams collaborate safely on shared codebases.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l77', 'Intro to APIs and HTTP Methods (GET/POST/PUT/DELETE)', 'developers', 'Web Development', 'en', 'intermediate', 35, 150, 77, '## Intro to APIs and HTTP Methods
+
+You have already used `requests.get()` to fetch data from an API. Today you will go deeper into how the web actually communicates, learning about **HTTP** (the protocol the entire web is built on) and its four most important methods: GET, POST, PUT, and DELETE.
+
+### What Is HTTP?
+
+HTTP (HyperText Transfer Protocol) is the set of rules that web browsers, apps, and servers use to talk to each other. Every time you visit a website or an app fetches data, it is making an HTTP **request** to a server, which sends back an HTTP **response**.
+
+A request has:
+- A **URL** — the address of the resource (e.g., `https://api.example.com/students/42`)
+- A **method** — what you want to do (get data? create something? change something? delete something?)
+- Sometimes a **body** — data being sent, like a new student''s information
+
+A response has:
+- A **status code** — a number telling you what happened (`200` success, `404` not found, `500` server error)
+- A **body** — usually JSON data
+
+### The Four Core HTTP Methods
+
+| Method | Purpose | Example |
+|---|---|---|
+| `GET` | Retrieve data | Get a list of students |
+| `POST` | Create new data | Add a new student |
+| `PUT` | Update existing data | Change a student''s grade |
+| `DELETE` | Remove data | Delete a student record |
+
+This pattern — GET, POST, PUT, DELETE — is often remembered by the acronym **CRUD**: Create, Read, Update, Delete.
+
+### GET: Reading Data
+
+You have already used this:
+
+```python
+import requests
+
+response = requests.get("https://api.agify.io?name=nova")
+print(response.status_code)   # 200
+print(response.json())
+```
+
+GET requests should never change anything on the server — they only *read* data.
+
+### POST: Creating New Data
+
+POST sends data *to* the server, usually to create something new. You include a body with the data:
+
+```python
+import requests
+
+new_post = {
+    "title": "My First Post",
+    "body": "This is the content of my post.",
+    "userId": 1
+}
+
+response = requests.post("https://jsonplaceholder.typicode.com/posts", json=new_post)
+print(response.status_code)   # 201 means "Created"
+print(response.json())
+```
+
+Status code `201` specifically means something new was successfully created.
+
+### PUT: Updating Existing Data
+
+PUT updates something that already exists, usually identified by an ID in the URL:
+
+```python
+import requests
+
+updated_post = {
+    "id": 1,
+    "title": "Updated Title",
+    "body": "Updated content.",
+    "userId": 1
+}
+
+response = requests.put("https://jsonplaceholder.typicode.com/posts/1", json=updated_post)
+print(response.status_code)   # 200
+print(response.json())
+```
+
+### DELETE: Removing Data
+
+```python
+import requests
+
+response = requests.delete("https://jsonplaceholder.typicode.com/posts/1")
+print(response.status_code)   # 200, meaning the deletion was successful
+```
+
+### Common HTTP Status Codes
+
+| Code | Category | Meaning |
+|---|---|---|
+| `200` | Success | OK, the request worked |
+| `201` | Success | Created — something new was made |
+| `400` | Client Error | Bad Request — something was wrong with your request |
+| `401` | Client Error | Unauthorized — you need to log in |
+| `404` | Client Error | Not Found — the resource doesn''t exist |
+| `500` | Server Error | Something went wrong on the server''s side |
+
+A simple rule of thumb: codes starting with `2` mean success, `4` means *you* made a mistake (bad URL, missing data), and `5` means the *server* made a mistake.
+
+### A Practical Example: A Mini Student API Client
+
+```python
+import requests
+
+BASE_URL = "https://jsonplaceholder.typicode.com"
+
+def get_all_posts():
+    response = requests.get(f"{BASE_URL}/posts")
+    return response.json()
+
+def create_post(title, body, user_id):
+    data = {"title": title, "body": body, "userId": user_id}
+    response = requests.post(f"{BASE_URL}/posts", json=data)
+    return response.json()
+
+def update_post(post_id, title, body, user_id):
+    data = {"id": post_id, "title": title, "body": body, "userId": user_id}
+    response = requests.put(f"{BASE_URL}/posts/{post_id}", json=data)
+    return response.json()
+
+def delete_post(post_id):
+    response = requests.delete(f"{BASE_URL}/posts/{post_id}")
+    return response.status_code
+
+posts = get_all_posts()
+print(f"Found {len(posts)} posts")
+
+new_post = create_post("Hello", "My first API post!", 1)
+print(new_post)
+```
+
+### Why This Matters
+
+Every app on your phone, every website you visit, and every modern piece of software relies on HTTP and these four methods to move data around. Understanding GET/POST/PUT/DELETE is essential before building your own web API in the next lesson, where you will be the one *receiving* these requests instead of just sending them.
+
+### Key Takeaways
+
+- HTTP is the protocol used for almost all communication on the web, made up of requests and responses.
+- GET retrieves data, POST creates new data, PUT updates existing data, and DELETE removes data — together known as CRUD operations.
+- Status codes starting with 2 mean success, 4 means a client-side error, and 5 means a server-side error.
+- The `requests` library supports all four methods: `requests.get()`, `requests.post()`, `requests.put()`, `requests.delete()`.
+- Understanding these methods is the foundation for building your own web API, which is exactly what comes next.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l78', 'Building a Simple REST API with Flask', 'developers', 'Web Development', 'en', 'intermediate', 35, 150, 78, '## Building a Simple REST API with Flask
+
+You have *used* APIs by sending GET, POST, PUT, and DELETE requests. Now you will flip to the other side and *build* your own API using **Flask**, a lightweight Python web framework. By the end of this lesson, you will have a working web server that responds to real HTTP requests.
+
+### What Is Flask?
+
+Flask is a Python library that makes it easy to build web applications and APIs. It listens for HTTP requests and lets you write Python functions that decide how to respond — using the `@app.route()` decorator you are now prepared to recognize from the decorators lesson!
+
+### Installing Flask
+
+```
+pip install flask
+```
+
+(Remember to do this inside an activated virtual environment, as you learned earlier.)
+
+### Your First Flask App
+
+```python
+# app.py
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Hello, world! This is my first API."
+
+if __name__ == "__main__":
+    app.run(debug=True)
+```
+
+Run it with:
+
+```
+python app.py
+```
+
+Then visit `http://127.0.0.1:5000/` in a browser, or use `requests.get("http://127.0.0.1:5000/")` from another Python script. You will see your message!
+
+`debug=True` automatically restarts the server when you change your code, which is very handy while building.
+
+### Returning JSON
+
+Real APIs almost always respond with JSON, not plain text. Flask has a built-in helper for this:
+
+```python
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+students = [
+    {"id": 1, "name": "Amir", "grade": 8},
+    {"id": 2, "name": "Lina", "grade": 7},
+]
+
+@app.route("/students")
+def get_students():
+    return jsonify(students)
+
+if __name__ == "__main__":
+    app.run(debug=True)
+```
+
+Visiting `/students` now returns a proper JSON array, exactly like the real APIs you have already used.
+
+### Handling URL Parameters
+
+You can build dynamic routes that take part of the URL as input:
+
+```python
+@app.route("/students/<int:student_id>")
+def get_student(student_id):
+    for student in students:
+        if student["id"] == student_id:
+            return jsonify(student)
+    return jsonify({"error": "Student not found"}), 404
+```
+
+Visiting `/students/1` returns Amir''s data. Visiting `/students/999` returns a 404 error, just like real APIs do.
+
+### Handling POST Requests (Creating Data)
+
+To accept data, you need to tell Flask which HTTP methods a route allows, and read the incoming JSON body using `request`:
+
+```python
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+students = [
+    {"id": 1, "name": "Amir", "grade": 8},
+]
+
+@app.route("/students", methods=["GET", "POST"])
+def students_route():
+    if request.method == "POST":
+        new_student = request.get_json()
+        new_student["id"] = len(students) + 1
+        students.append(new_student)
+        return jsonify(new_student), 201
+    return jsonify(students)
+
+if __name__ == "__main__":
+    app.run(debug=True)
+```
+
+Now, sending a POST request with a JSON body like `{"name": "Theo", "grade": 8}` to `/students` adds a new student and responds with `201 Created` — exactly the behavior you learned about in the previous lesson.
+
+### Handling PUT and DELETE
+
+```python
+@app.route("/students/<int:student_id>", methods=["PUT", "DELETE"])
+def modify_student(student_id):
+    student = next((s for s in students if s["id"] == student_id), None)
+    if student is None:
+        return jsonify({"error": "Student not found"}), 404
+
+    if request.method == "PUT":
+        updates = request.get_json()
+        student.update(updates)
+        return jsonify(student)
+
+    if request.method == "DELETE":
+        students.remove(student)
+        return jsonify({"message": "Student deleted"})
+```
+
+### Testing Your API From Python
+
+Once your Flask server is running in one terminal, you can talk to it from another script, just like you did with real APIs:
+
+```python
+import requests
+
+response = requests.get("http://127.0.0.1:5000/students")
+print(response.json())
+
+new_student = {"name": "Sam", "grade": 7}
+response = requests.post("http://127.0.0.1:5000/students", json=new_student)
+print(response.status_code)   # 201
+print(response.json())
+```
+
+### Putting It All Together: A Mini Student API
+
+Combine everything above into one `app.py`: a `students` list as your data, a `GET`/`POST` route for `/students`, and a `GET`/`PUT`/`DELETE` route for `/students/<int:student_id>`. This single file is a real, working REST API — the same basic shape used by huge, professional production systems, just smaller.
+
+### Why This Matters
+
+Every app you have used that saves data to the cloud — games with leaderboards, messaging apps, social media — has a server somewhere built using ideas just like these (often not Flask exactly, but the same core concepts of routes, methods, and JSON responses). You have now built both sides of the client-server relationship.
+
+### Key Takeaways
+
+- Flask is a Python framework for building web applications and APIs using simple route functions.
+- `@app.route("/path")` defines what happens when someone visits that URL; `methods=["GET", "POST"]` controls which HTTP methods are allowed.
+- `jsonify()` converts Python data into a proper JSON HTTP response.
+- `request.get_json()` reads the JSON body sent with a POST or PUT request.
+- Returning a tuple like `jsonify(data), 201` lets you set a custom status code alongside your response.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
+
+INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions) VALUES
+('dev-l79', 'Intro to SQL and Databases (SELECT, INSERT, WHERE)', 'developers', 'Databases', 'en', 'intermediate', 35, 150, 79, '## Intro to SQL and Databases
+
+You used SQLite from inside Python a few lessons ago, sending SQL commands through `cursor.execute()`. Today you will slow down and focus on **SQL** itself — the language of databases — so you deeply understand the commands you have already been using, and can write more powerful ones.
+
+### What Is SQL?
+
+SQL (Structured Query Language) is a language designed specifically for working with data stored in tables. It is used by nearly every database system in the world — SQLite, PostgreSQL (which this very platform uses!), MySQL, and more. Learning SQL is one of the most universally useful skills in software development.
+
+### Tables, Rows, and Columns
+
+A SQL table looks like a spreadsheet:
+
+```
+students table:
+
+| id | name  | age | grade |
+|----|-------|-----|-------|
+| 1  | Amir  | 13  | 8     |
+| 2  | Lina  | 12  | 7     |
+| 3  | Theo  | 14  | 8     |
+```
+
+Each row is one record (one student). Each column is one piece of information about that record (name, age, grade).
+
+### CREATE TABLE: Defining a Table''s Structure
+
+```sql
+CREATE TABLE students (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    age INTEGER,
+    grade INTEGER
+);
+```
+
+This defines the shape of the data before anything is stored.
+
+### INSERT: Adding Data
+
+```sql
+INSERT INTO students (name, age, grade) VALUES ("Amir", 13, 8);
+INSERT INTO students (name, age, grade) VALUES ("Lina", 12, 7);
+INSERT INTO students (name, age, grade) VALUES ("Theo", 14, 8);
+```
+
+Each `INSERT` adds one new row to the table.
+
+### SELECT: Reading Data
+
+`SELECT` is the most common SQL command — it retrieves data from a table.
+
+```sql
+SELECT * FROM students;
+```
+
+The `*` means "every column." This returns all rows, with all their columns.
+
+To get only specific columns:
+
+```sql
+SELECT name, grade FROM students;
+```
+
+```
+| name  | grade |
+|-------|-------|
+| Amir  | 8     |
+| Lina  | 7     |
+| Theo  | 8     |
+```
+
+### WHERE: Filtering Rows
+
+`WHERE` narrows down which rows are returned, based on a condition:
+
+```sql
+SELECT * FROM students WHERE grade = 8;
+```
+
+```
+| id | name  | age | grade |
+|----|-------|-----|-------|
+| 1  | Amir  | 13  | 8     |
+| 3  | Theo  | 14  | 8     |
+```
+
+You can use comparison operators just like in Python:
+
+```sql
+SELECT * FROM students WHERE age > 12;
+SELECT * FROM students WHERE age >= 13 AND grade = 8;
+SELECT * FROM students WHERE name != "Lina";
+SELECT * FROM students WHERE name LIKE "A%";   -- starts with "A"
+```
+
+`AND`/`OR` combine multiple conditions, just like Python''s `and`/`or`. `LIKE` with a `%` wildcard matches text patterns.
+
+### ORDER BY: Sorting Results
+
+```sql
+SELECT * FROM students ORDER BY age;            -- smallest to largest
+SELECT * FROM students ORDER BY age DESC;        -- largest to smallest
+```
+
+### UPDATE: Changing Existing Data
+
+```sql
+UPDATE students SET grade = 9 WHERE name = "Amir";
+```
+
+This changes Amir''s grade to 9. Be careful: if you forget the `WHERE` clause, **every row** gets updated!
+
+### DELETE: Removing Data
+
+```sql
+DELETE FROM students WHERE name = "Theo";
+```
+
+Just like `UPDATE`, forgetting `WHERE` here would delete **every row** in the table — always double check before running a `DELETE`.
+
+### Using SQL From Python (A Quick Reminder)
+
+You already saw this pattern in the SQLite lesson — now you understand the SQL itself much more deeply:
+
+```python
+import sqlite3
+
+connection = sqlite3.connect("school.db")
+cursor = connection.cursor()
+
+cursor.execute("SELECT * FROM students WHERE grade = ?", (8,))
+results = cursor.fetchall()
+for row in results:
+    print(row)
+
+connection.close()
+```
+
+### A Practical Example: Querying for a Report
+
+```sql
+-- Find all students aged 13 or older, sorted by name
+SELECT name, age, grade
+FROM students
+WHERE age >= 13
+ORDER BY name;
+```
+
+```sql
+-- Count how many students are in grade 8
+SELECT COUNT(*) FROM students WHERE grade = 8;
+```
+
+`COUNT(*)` is one of several built-in SQL functions for summarizing data — others include `AVG()`, `SUM()`, `MIN()`, and `MAX()`.
+
+```sql
+SELECT AVG(age) FROM students;
+SELECT MAX(grade) FROM students;
+```
+
+### Why SQL Matters
+
+Almost every application that stores meaningful amounts of data — social media platforms, banking apps, school grading systems, even this very curriculum platform — uses a SQL database behind the scenes. The four commands you learned today — `SELECT`, `INSERT`, `UPDATE`, `DELETE` — paired with `WHERE` for filtering, are the core of working with virtually any relational database you will ever encounter.
+
+### Key Takeaways
+
+- SQL is the standard language for creating, reading, updating, and deleting data in a relational database.
+- `SELECT` retrieves data, `INSERT` adds it, `UPDATE` changes it, and `DELETE` removes it.
+- `WHERE` filters which rows a command affects — always double-check it before running `UPDATE` or `DELETE`.
+- `ORDER BY` sorts results, and functions like `COUNT()`, `AVG()`, and `MAX()` summarize data.
+- These same SQL fundamentals apply across nearly every database system you will use in your programming career, from SQLite to large production databases.')
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, instructions = EXCLUDED.instructions;
