@@ -36,8 +36,7 @@ export async function POST(req: NextRequest) {
   let level: string
   if (age <= 7) level = 'explorers'
   else if (age <= 10) level = 'builders'
-  else if (age <= 13) level = 'developers'
-  else level = 'engineers'
+  else level = 'developers'
 
   // Use service client to create a new auth user for the child
   const serviceSupabase = await createServiceClient()

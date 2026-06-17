@@ -5,6 +5,13 @@
 
 ---
 
+## Repository Readiness
+
+- [x] Required PWA and Open Graph assets committed under `/public/`
+- [x] Vercel weekly digest cron aligned with deployment guide (`0 8 * * 1` UTC)
+- [x] Public signup, login, reset, and legal links preserve the active locale
+- [x] Launch curriculum exposure limited to seeded levels (Explorers, Builders, Developers)
+
 ## Infrastructure
 
 - [ ] Supabase project created and all SQL files run in order (see DEPLOYMENT.md)
@@ -53,7 +60,7 @@
 
 ## Content
 
-- [ ] All curriculum SQL loaded: Explorers, Builders, Developers lessons and quizzes
+- [ ] All launch curriculum SQL loaded: Explorers, Builders, Developers lessons and quizzes
 - [ ] At least one admin account created (`role = 'admin'` in profiles table)
 - [ ] At least one test parent + student account created end-to-end
 - [ ] Student can complete a lesson, take a quiz, and earn XP

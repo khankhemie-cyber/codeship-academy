@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { requireRole } from '@/lib/utils/auth'
 import { z } from 'zod'
 
@@ -71,7 +71,8 @@ export async function POST(req: NextRequest) {
     submission = data
 
     // Award XP on first submission
-    await supabase.rpc('award_xp', {
+    const serviceSupabase = await createServiceClient()
+    await serviceSupabase.rpc('award_xp', {
       p_student_id: profile.id,
       p_xp: project.xp_reward,
       p_source: 'project',

@@ -54,12 +54,11 @@ Student info:
 CODEship Academy levels:
 - Explorers (K-1, ages 6-7): Block coding, visual logic, computational thinking
 - Builders (Gr 2-3, ages 8-9): HTML, CSS, Scratch
-- Developers (Gr 4-6, ages 10-12): JavaScript, APIs, React, Python intro
-- Engineers (Gr 7-8, ages 13-16): Python, Flask, SQL, Git, ML basics
+- Developers (Gr 4-8, ages 10-16): JavaScript, APIs, React, Python intro. Older students can start here with extension projects.
 
 Respond in JSON format only:
 {
-  "recommendedLevel": "explorers|builders|developers|engineers",
+  "recommendedLevel": "explorers|builders|developers",
   "confidence": "high|medium|low",
   "rationale": "2-3 sentence explanation for the parent",
   "learningStyle": "visual|hands-on|conceptual|mixed",

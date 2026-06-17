@@ -5,7 +5,7 @@ import Link from 'next/link'
 const LEVEL_META: Record<string, { emoji: string; label: string; grades: string }> = {
   explorers:  { emoji: '🌱', label: 'Explorers',  grades: 'K–1' },
   builders:   { emoji: '🏗️', label: 'Builders',   grades: 'Gr 2–3' },
-  developers: { emoji: '💻', label: 'Developers', grades: 'Gr 4–6' },
+  developers: { emoji: '💻', label: 'Developers', grades: 'Gr 4–8' },
   engineers:  { emoji: '⚙️', label: 'Engineers',  grades: 'Gr 7–8' },
 }
 
@@ -70,12 +70,11 @@ export default async function CurriculumPage({
     progress?.forEach((p: any) => { progressMap[p.lesson_id] = p.status })
   }
 
-  const levels = ['explorers', 'builders', 'developers', 'engineers']
+  const levels = ['explorers', 'builders', 'developers']
   const categories: Record<string, string[]> = {
     explorers:  ['Fundamentals', 'Algorithms', 'Block Coding', 'Creative Coding', 'Digital Citizenship', 'Computational Thinking', 'Art & Design'],
     builders:   ['HTML', 'CSS', 'Scratch', 'Accessibility', 'Digital Citizenship', 'Projects'],
     developers: ['JavaScript', 'Node.js', 'React', 'Python', 'Algorithms', 'Testing', 'Fundamentals', 'Projects'],
-    engineers:  ['Python', 'Flask', 'SQL', 'Git', 'Data Science', 'Machine Learning', 'Deployment', 'Projects'],
   }
 
   return (

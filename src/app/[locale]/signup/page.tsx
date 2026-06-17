@@ -3,10 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 
 export default function SignupPage() {
   const router = useRouter()
+  const locale = useLocale()
   const [form, setForm] = useState({
     fullName: '',
     email: '',
@@ -47,7 +49,7 @@ export default function SignupPage() {
       password: form.password,
       options: {
         data: { full_name: form.fullName, role: form.role },
-        emailRedirectTo: `${window.location.origin}/en/verify-email`,
+        emailRedirectTo: `${window.location.origin}/${locale}/verify-email`,
       },
     })
 
@@ -76,7 +78,7 @@ export default function SignupPage() {
         )
       }
 
-      router.push('/en/verify-email')
+      router.push(`/${locale}/verify-email`)
     }
   }
 
@@ -84,7 +86,7 @@ export default function SignupPage() {
     <div className="min-h-screen bg-brand-light flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
         <div className="text-center mb-8">
-          <Link href="/en" className="font-extrabold text-2xl text-brand-navy">
+          <Link href={`/${locale}`} className="font-extrabold text-2xl text-brand-navy">
             CODEship Academy
           </Link>
           <h1 className="text-xl font-bold text-brand-dark mt-2">Create your account</h1>
@@ -201,7 +203,7 @@ export default function SignupPage() {
                 />
                 <span id="terms-desc" className="text-sm text-gray-700">
                   I accept the{' '}
-                  <Link href="/en/terms" target="_blank" className="text-brand-navy underline">
+                  <Link href={`/${locale}/terms`} target="_blank" className="text-brand-navy underline">
                     Terms of Service
                   </Link>
                 </span>
@@ -218,7 +220,7 @@ export default function SignupPage() {
                 />
                 <span id="privacy-desc" className="text-sm text-gray-700">
                   I have read and agree to the{' '}
-                  <Link href="/en/privacy" target="_blank" className="text-brand-navy underline">
+                  <Link href={`/${locale}/privacy`} target="_blank" className="text-brand-navy underline">
                     Privacy Policy
                   </Link>
                   , including how we process data for children under 13
@@ -243,7 +245,7 @@ export default function SignupPage() {
 
           <div className="mt-6 pt-6 border-t border-gray-100 text-center text-sm text-gray-600">
             Already have an account?{' '}
-            <Link href="/en/login" className="text-brand-navy font-bold hover:underline">
+            <Link href={`/${locale}/login`} className="text-brand-navy font-bold hover:underline">
               Sign in
             </Link>
           </div>

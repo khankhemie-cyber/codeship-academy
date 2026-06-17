@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { useLocale } from 'next-intl'
 
 const levels = [
   {
@@ -23,20 +22,11 @@ const levels = [
   {
     emoji: '💻',
     name: 'Developers',
-    grades: 'Gr 4–6',
-    ages: 'Ages 10–12',
-    desc: 'JavaScript, APIs, React, Python intro',
+    grades: 'Gr 4–8',
+    ages: 'Ages 10–16',
+    desc: 'JavaScript, APIs, React, Python intro, and extension projects',
     color: 'bg-purple-50 border-purple-200',
     badge: 'bg-purple-100 text-purple-800',
-  },
-  {
-    emoji: '⚙️',
-    name: 'Engineers',
-    grades: 'Gr 7–8',
-    ages: 'Ages 13–16',
-    desc: 'Python, Flask, SQL, Git, ML basics',
-    color: 'bg-orange-50 border-orange-200',
-    badge: 'bg-orange-100 text-orange-800',
   },
 ]
 
@@ -49,15 +39,18 @@ const features = [
   { icon: '🏫', title: 'School Portal', desc: 'Workshop booking, attendance tracking, impact reports' },
 ]
 
-export default function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const otherLocale = locale === 'fr' ? 'en' : 'fr'
+
   return (
     <div className="min-h-screen bg-white">
       {/* Nav */}
       <nav className="bg-brand-navy text-white px-6 py-4 flex items-center justify-between">
         <span className="font-extrabold text-xl text-brand-gold">CODEship Academy</span>
         <div className="flex items-center gap-4">
-          <Link href="/en/login" className="text-sm hover:text-brand-gold transition-colors">Login</Link>
-          <Link href="/en/signup" className="btn-primary text-sm py-2 px-4">Start Free Trial</Link>
+          <Link href={`/${locale}/login`} className="text-sm hover:text-brand-gold transition-colors">Login</Link>
+          <Link href={`/${locale}/signup`} className="btn-primary text-sm py-2 px-4">Start Free Trial</Link>
         </div>
       </nav>
 
@@ -73,7 +66,7 @@ export default function LandingPage({ params }: { params: Promise<{ locale: stri
             Start with blocks, end with full-stack apps.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/en/signup" className="btn-primary text-lg px-8 py-4">
+            <Link href={`/${locale}/signup`} className="btn-primary text-lg px-8 py-4">
               Start Free Trial — 14 Days Free
             </Link>
             <Link
@@ -89,12 +82,12 @@ export default function LandingPage({ params }: { params: Promise<{ locale: stri
         {/* Levels */}
         <section className="py-20 px-6 max-w-6xl mx-auto">
           <h2 className="text-3xl font-extrabold text-brand-navy text-center mb-4">
-            Four Levels. Every Child.
+            Launch Curriculum for Every Child
           </h2>
           <p className="text-center text-gray-600 mb-12 max-w-xl mx-auto">
             AI assessment places every student at the right level, then guides them through a structured curriculum built for Canada.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {levels.map((level) => (
               <div key={level.name} className={`rounded-2xl border-2 p-6 ${level.color}`}>
                 <div className="text-4xl mb-3">{level.emoji}</div>
@@ -142,7 +135,7 @@ export default function LandingPage({ params }: { params: Promise<{ locale: stri
                 <div className="text-3xl font-extrabold my-4 text-brand-gold">{plan.price}</div>
                 <p className={plan.highlight ? 'text-gray-300' : 'text-gray-600'}>{plan.desc}</p>
                 <Link
-                  href="/en/signup"
+                  href={`/${locale}/signup`}
                   className={`block mt-6 font-bold py-3 px-6 rounded-xl transition-colors ${plan.highlight ? 'bg-brand-gold text-brand-navy hover:opacity-90' : 'bg-brand-navy text-white hover:bg-brand-mid'}`}
                 >
                   Start Free Trial
@@ -160,7 +153,7 @@ export default function LandingPage({ params }: { params: Promise<{ locale: stri
               90-minute enrichment workshops at $280/class or $950/full-day.
               Impact reports included. AODA-compliant. Bilingual EN/FR.
             </p>
-            <Link href="/en/signup?type=teacher" className="btn-primary text-lg px-8 py-4">
+            <Link href={`/${locale}/signup?type=teacher`} className="btn-primary text-lg px-8 py-4">
               Book a Workshop
             </Link>
           </div>
@@ -176,9 +169,11 @@ export default function LandingPage({ params }: { params: Promise<{ locale: stri
             <div className="text-sm">admin@codeshipacademy.com</div>
           </div>
           <div className="flex flex-wrap gap-6 text-sm">
-            <Link href="/en/privacy" className="hover:text-white">Privacy Policy</Link>
-            <Link href="/en/terms" className="hover:text-white">Terms of Service</Link>
-            <Link href="/fr" className="hover:text-white">Français</Link>
+            <Link href={`/${locale}/privacy`} className="hover:text-white">Privacy Policy</Link>
+            <Link href={`/${locale}/terms`} className="hover:text-white">Terms of Service</Link>
+            <Link href={`/${otherLocale}`} className="hover:text-white">
+              {locale === 'fr' ? 'English' : 'Français'}
+            </Link>
           </div>
         </div>
         <div className="max-w-6xl mx-auto mt-6 pt-6 border-t border-gray-700 text-xs text-gray-500">

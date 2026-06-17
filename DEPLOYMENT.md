@@ -96,9 +96,9 @@ endpoint with the `Authorization` header.
 
 ---
 
-## Required Web Assets (add before launch)
+## Required Web Assets
 
-Place these files in `/public/`:
+These launch assets are committed in `/public/`:
 
 | File | Size | Purpose |
 |---|---|---|
@@ -111,8 +111,8 @@ Place these files in `/public/`:
 | `icons/apple-touch-icon.png` | 180×180 | iOS Safari "Add to Home Screen" |
 | `og-image.png` | 1200×630 | Open Graph / Twitter card |
 
-Recommended tool: https://realfavicongenerator.net — upload a 512×512 SVG/PNG
-of the CODEship logo and it generates all sizes including maskable variants.
+The vector source for the generated icon set is available at
+`/public/icons/codeship-mark.svg`.
 
 ---
 
@@ -135,6 +135,9 @@ of the CODEship logo and it generates all sizes including maskable variants.
    previously lived in `patch.sql`, `curriculum.sql`, `classes.sql`, and
    `school-portal.sql` (those files were removed). All files are idempotent and
    safe to re-run.
+   The launch curriculum exposes Explorers, Builders, and Developers; grade 7–8
+   learners are placed in Developers with extension projects until Engineers
+   seed content is added.
 3. Row Level Security is enabled on every table by `schema.sql` (no manual step).
 4. Under **Authentication → URL Configuration**, set:
    - Site URL: `https://app.codeshipacademy.com`

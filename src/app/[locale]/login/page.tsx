@@ -3,10 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 import { createClient } from '@/lib/supabase/client'
 
-export default function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
+export default function LoginPage() {
   const router = useRouter()
+  const locale = useLocale()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -34,7 +36,7 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
         .single()
 
       const role = userData?.role ?? 'parent'
-      router.push(`/en/dashboard/${role}`)
+      router.push(`/${locale}/dashboard/${role}`)
     }
   }
 
@@ -42,7 +44,7 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
     <div className="min-h-screen bg-brand-light flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/en" className="font-extrabold text-2xl text-brand-navy">
+          <Link href={`/${locale}`} className="font-extrabold text-2xl text-brand-navy">
             CODEship Academy
           </Link>
           <h1 className="text-xl font-bold text-brand-dark mt-2">Welcome back!</h1>
@@ -98,14 +100,14 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
           </form>
 
           <div className="mt-4 text-center text-sm">
-            <Link href="/en/reset-password" className="text-brand-navy hover:underline">
+            <Link href={`/${locale}/reset-password`} className="text-brand-navy hover:underline">
               Forgot your password?
             </Link>
           </div>
 
           <div className="mt-6 pt-6 border-t border-gray-100 text-center text-sm text-gray-600">
             Don&apos;t have an account?{' '}
-            <Link href="/en/signup" className="text-brand-navy font-bold hover:underline">
+            <Link href={`/${locale}/signup`} className="text-brand-navy font-bold hover:underline">
               Start free trial
             </Link>
           </div>
