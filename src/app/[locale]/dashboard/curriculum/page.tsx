@@ -31,7 +31,12 @@ export default async function CurriculumPage({
   if (!user) redirect(`/${locale}/login`)
 
   const { data: userData } = await supabase.from('users').select('role').eq('id', user.id).single()
-  let studentId = user.id
+  const { data: ownProfile } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .single()
+  let studentId = ownProfile?.id ?? user.id
 
   // For parents, get the first child
   if (userData?.role === 'parent') {
@@ -41,7 +46,7 @@ export default async function CurriculumPage({
       .eq('parent_id', user.id)
       .limit(1)
       .single()
-    studentId = firstChild?.id ?? user.id
+    studentId = firstChild?.id ?? studentId
   }
 
   // Fetch curriculum items

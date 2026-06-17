@@ -12,22 +12,24 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
   if (userData?.role !== 'student' && userData?.role !== 'admin') redirect(`/${locale}/dashboard`)
 
   const { data: student } = await supabase
-    .from('student_profiles')
-    .select('*')
-    .eq('id', user.id)
+    .from('profiles')
+    .select('id, display_name, level, avatar_emoji, total_xp, current_streak')
+    .eq('user_id', user.id)
     .single()
+
+  const studentId = student?.id ?? '00000000-0000-0000-0000-000000000000'
 
   const { data: recentProgress } = await supabase
     .from('lesson_progress')
     .select('*, lessons(slug, title, level, category, duration_minutes)')
-    .eq('student_id', user.id)
+    .eq('student_id', studentId)
     .eq('status', 'in_progress')
     .limit(3)
 
   const { data: achievements } = await supabase
     .from('student_achievements')
     .select('*, achievements(name, icon_emoji)')
-    .eq('student_id', user.id)
+    .eq('student_id', studentId)
     .order('awarded_at', { ascending: false })
     .limit(3)
 
@@ -54,7 +56,7 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
             Hi, {userData?.full_name?.split(' ')[0] ?? 'Coder'}! {levelEmoji[level]}
           </h1>
           <p className="text-gray-500">
-            {student?.streak_days ?? 0} day streak · {student?.xp_points ?? 0} XP
+            {student?.current_streak ?? 0} day streak · {student?.total_xp ?? 0} XP
           </p>
         </div>
       </div>
@@ -93,8 +95,8 @@ export default async function StudentDashboard({ params }: { params: Promise<{ l
       <section className="mb-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { icon: '⭐', label: 'XP Points', value: student?.xp_points ?? 0 },
-            { icon: '🔥', label: 'Day Streak', value: student?.streak_days ?? 0 },
+            { icon: '⭐', label: 'XP Points', value: student?.total_xp ?? 0 },
+            { icon: '🔥', label: 'Day Streak', value: student?.current_streak ?? 0 },
             { icon: '✅', label: 'Lessons Done', value: '—' },
             { icon: '🏅', label: 'Achievements', value: achievements?.length ?? 0 },
           ].map((stat) => (

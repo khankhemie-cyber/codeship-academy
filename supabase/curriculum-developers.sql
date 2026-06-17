@@ -579,7 +579,7 @@ ON CONFLICT (slug) DO NOTHING;
 -- Insert remaining lessons 7-100 with structured content
 INSERT INTO lessons (slug, title, level, category, language, difficulty, duration_minutes, xp_reward, sort_order, instructions)
 SELECT
-  'dev-l' || LPAD(n::text, 2, '0'),
+  'dev-l' || LPAD(n::text, GREATEST(2, length(n::text)), '0'),
   title,
   'developers',
   category,
@@ -690,7 +690,7 @@ ON CONFLICT (slug) DO NOTHING;
 -- Developers Projects (dev-p01 to dev-p100)
 INSERT INTO projects (slug, title, level, category, starter_code, instructions, tags, xp_reward, sort_order)
 SELECT
-  'dev-p' || LPAD(n::text, 2, '0'),
+  'dev-p' || LPAD(n::text, GREATEST(2, length(n::text)), '0'),
   title,
   'developers',
   category,
@@ -713,7 +713,7 @@ ON CONFLICT (slug) DO NOTHING;
 -- Insert remaining projects 6-100
 INSERT INTO projects (slug, title, level, category, starter_code, instructions, tags, xp_reward, sort_order)
 SELECT
-  'dev-p' || LPAD(n::text, 2, '0'),
+  'dev-p' || LPAD(n::text, GREATEST(2, length(n::text)), '0'),
   title,
   'developers',
   category,
